@@ -148,6 +148,8 @@ As example a commented clipping of the 'hosts' file:
  szczecin_gitserver
  szczecin_raspbian
  ```
+ As you can see I have grouped my hosts by location (berlin & szczecin), by function (gitserver) and by OS (raspbian). This enables me to link them with variables based on groups, more about that in [Variables](#variables).
+ 
 #### Playbooks
 The previous mentioned repeatable cooking receipts - on which machine(s) do you want to execute which tasks and what are the environment parameters (details see [Ansible - About Playbooks][ansible-playbooks]).
 Example: gitserver.yml
@@ -169,7 +171,7 @@ Instead of writing the same tasks again and again for different playbooks, you c
 
 ### Variables
 Comming back to variables - while Ansibles knows a number of options where to set them (details see [Ansible - Using Variables][ansible-variables]), the basic option is to link them to machines in your [Inventory](#inventory). 
-Our target is named 'git' and a member of the groups 'gitserver', 'raspbian' and the special group 'all', which means the variables for all these groups (called group_vars) and the variables for our target (called host_vars) apply. And if you followed [Set IP Address Variables](#set-ip-address-variables), you actually already know where to find them:
+Our target is named 'git' and a member of the groups 'szczecin-gitserver', 'szczecin-raspbian', 'gitserver', 'raspbian', 'szczecin' and the special group 'all', which means the variables for all these groups (called group_vars) and the variables for our target (called host_vars) apply. And if you followed [Set IP Address Variables](#set-ip-address-variables), you actually already know where to find them:
 * group_vars: working directory/group_vars/<group name>.yml
 * host_vars: working_directory/host_vars/<host name>.yml
 
@@ -199,13 +201,15 @@ git_os_user_password_hash:
 git_commit_user_name:
 git_commit_user_email:
 ```
-Additionally you have the option to have Ansible import repos from a backup location. For that follow the instructions in the the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine):
+Additionally my play has the option to have Ansible import repos from a backup location. For that follow the instructions in the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine):
 ```yml
 # working directory/group_vars/gitserver.yml
 
 git_private_key:
 git_repositories:
 ```
+
+Disclaimer: I ignored variable precedence in my explanations (if you set the same variable in multiple location, for example group_vars & host_vars, which value applies?), please look that up at [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence].
 
 ### Going back to Start
 What? After having finally a running Git server?
@@ -312,5 +316,6 @@ Our playbook should execute two roles with a certain set of variables.
 [ansible-roles]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles
 [ansible-galaxy]: https://galaxy.ansible.com
 [ansible-variables]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html
+[ansible-precedence]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
 [git-server]: https://git-scm.com/book/en/v2/Git-on-the-Server-Getting-Git-on-a-Server
 [worklog]: https://community.openhab.org/t/setting-up-my-own-git-server-on-a-pi/
