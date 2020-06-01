@@ -128,49 +128,84 @@ I aim to keep the vocabulary lessons to a minimum, but lets have a look at three
 #### Inventory
 A list of computers managed by Ansible, sorted into groups (details see [Ansible - How to build your inventory][ansible-inventory]).
 As example a commented clipping of the 'hosts' file:
-    ```
-    # file: host
-    ...
-    [szczecin_gitserver]            # group
-    git                             # a managed computer, called host
+ ```
+ # file: host
+ ...
+ [szczecin_gitserver]            # group
+ git                             # a managed computer, called host
 
-    [szczecin_raspbian]             # different group
-    git                             # same host
+ [szczecin_raspbian]             # different group
+ git                             # same host
 
-    # gitserver in all locations    
-    [gitserver:children]            # group of groups
-    szczecin_gitserver
+ # gitserver in all locations    
+ [gitserver:children]            # group of groups
+ szczecin_gitserver
 
-    ...
+ ...
 
-    # everything in szczecin        # different group of groups
-    [szczecin:children]
-    szczecin_gitserver
-    szczecin_raspbian
-    ```
+ # everything in szczecin        # different group of groups
+ [szczecin:children]
+ szczecin_gitserver
+ szczecin_raspbian
+ ```
 #### Playbooks
 The previous mentioned repeatable cooking receipts - on which machine(s) do you want to execute which tasks and what are the environment parameters (details see [Ansible - About Playbooks][ansible-playbooks]).
 Example: gitserver.yml
-    ```yml
-    - name: playbook to set up a git server     # name of your play
-      hosts: gitserver                          # group of machines to which to apply this play
-      gather_facts: false                       # \
-      debugger: on_failed                       # - optional parameters
-      become: true                              # / 
+```yml
+- name: playbook to set up a git server     # name of your play
+  hosts: gitserver                          # group of machines to which to apply this play
+  gather_facts: false                       # \
+  debugger: on_failed                       # - optional parameters
+  become: true                              # / 
 
-      tasks:                                    # list of tasks
-      - include_role: 
-        name: prepare-raspberry
-      - include_role: 
-        name: gitserver-config
-    ```
+  tasks:                                    # list of tasks
+  - include_role: 
+    name: prepare-raspberry
+  - include_role: 
+    name: gitserver-config
+```
 #### Roles
 Instead of writing the same tasks again and again for different playbooks, you can bundle tasks into roles (details see [Ansible - Roles][ansible-roles]). But the biggest advantage of roles is that they are sharable - just have a look at [Ansible Galaxy][ansible-galaxy] to find roles for almost all common tasks.
 
 ### Variables
-Comming back to variables - while Ansibles knows a number of options where to set them (details see [Ansible - Using Variables][ansible-variables]), the basic option is to link them to machines in your [Inventory](#inventory).
+Comming back to variables - while Ansibles knows a number of options where to set them (details see [Ansible - Using Variables][ansible-variables]), the basic option is to link them to machines in your [Inventory](#inventory). 
+Our target is named 'git' and a member of the groups 'gitserver', 'raspbian' and the special group 'all', which means the variables for all these groups (called group_vars) and the variables for our target (called host_vars) apply. And if you followed [Set IP Address Variables](#set-ip-address-variables), you actually already know where to find them:
+* group_vars: working directory/group_vars/<group name>.yml
+* host_vars: working_directory/host_vars/<host name>.yml
 
+For an individualized Git server I would recommend to set at least the following variables, for more options look into the variable files:
+```yml
+# working directory/group_vars/all.yml
 
+#default system user
+ansible_user: link
+# ...
+ssh_public_key: []
+```
+```yml
+# working directory/group_vars/raspbian.yml
+
+# system user name
+user_name: link
+```
+```yml
+# working directory/group_vars/gitserver.yml
+
+ansible_host:
+ansible_port:
+user_password_hash:
+ssh_port:
+git_os_user_password_hash:
+git_commit_user_name:
+git_commit_user_email:
+```
+Additionally you have the option to have Ansible import repos from a backup location. For that follow the instructions in the the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine):
+```yml
+# working directory/group_vars/gitserver.yml
+
+git_private_key:
+git_repositories:
+```
 
 ### Going back to Start
 What? After having finally a running Git server?
