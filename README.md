@@ -9,13 +9,13 @@ To have a repeatable and versionable cooking receipt for setting up servers soun
 
 Since the best way to learn something is
 1. to use it
-2. to teach[^disclaimer] it
+2. to teach<sup id="a1">[1](#f1)</sup> it
 
 I decided to take an existing [work log][worklog], to turn it into an Ansible play and to document what I did.
 
 ### Tools & Platform
-* machine with Ansible: running [Ubuntu 18.04 LTS](https://ubuntu.com)[^ansible-machine]
-* target: [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)[^raspi]
+* machine with Ansible: running [Ubuntu 18.04 LTS](https://ubuntu.com)<sup id="a2">[2](#f2)</sup>
+* target: [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<sup id="a3">[3](#f3)</sup>
 * target OS: [Raspbian Buster Lite](https://www.raspberrypi.org/downloads/raspbian/)
 * server administration tool: [Ansible 2.9][ansible-intro]
 
@@ -41,7 +41,7 @@ If not stated otherwise all steps have to be done on your Ansible machine, not o
 ### Prepare your Raspberry Pi
 * download Raspbian Lite https://www.raspberrypi.org/downloads/
 * write image on SD card https://www.raspberrypi.org/documentation/installation/installing-images/README.md
-    * `touch /Volumes/boot/ssh`[^mounting_point] enable SSH by writing an empty file called `ssh` on the boot partition[^etcher]
+    * `touch /Volumes/boot/ssh`<sup id="a4">[4](#f4)</sup> enable SSH by writing an empty file called `ssh` on the boot partition<sup id="a5">[5](#f5)</sup>
     * eject & insert SD card into your Raspi
     * connect your Raspberry Pi to LAN and power
 * if missing, generate ssh public key on your Ansible machine: `ssh-keygen -o`
@@ -303,11 +303,11 @@ Our playbook should execute two roles with a certain set of variables.
 * my git server [work log][worklog]
 
 
-[^disclaimer]: Keep in mind, I neither consider myself an Linux-, Raspberry-, security-, Git- or Ansible-expert. So please let me know about possible improvements and, especially, think twice before you copy-paste security related stuff!
-[^ansible-machine]: You can install Ansible on a variety of different Linux distributions or macOS, have a look at the [docs](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
-[^raspi]: An older model shouldn't be a problem, I just had that one laying around.
-[^mounting_point]: Your mounting point for the SD Card might differ
-[^etcher]: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again.
+<b id="f1">1</b>: Keep in mind, I neither consider myself an Linux-, Raspberry-, security-, Git- or Ansible-expert. So please let me know about possible improvements and, especially, think twice before you copy-paste security related stuff! [↩](#a1)  
+<b id="f2">2</b>: You can install Ansible on a variety of different Linux distributions or macOS, have a look at the [docs](https://docs.ansible.com/ansible/latest/installation_guide/index.html) [↩](#a2)  
+<b id="f3">3</b>: An older model shouldn't be a problem, I just had that one laying around. [↩](#a3)  
+<b id="f4">4</b>: Your mounting point for the SD Card might differ [↩](#a4)  
+<b id="f5">5</b>: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again. [↩](#a5)  
 
 [ansible-intro]: https://docs.ansible.com/ansible/latest/index.html
 [ansible-install]: https://docs.ansible.com/ansible/latest/installation_guide/index.html
