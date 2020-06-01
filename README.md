@@ -127,28 +127,37 @@ An Ansible based setup process would not be very useful if you couldn't change m
 I aim to keep the vocabulary lessons to a minimum, but lets have a look at three key concepts:
 #### Inventory
 A list of computers managed by Ansible, sorted into groups (details see [Ansible - How to build your inventory][ansible-inventory]).
-As example a commented clipping of the 'hosts' file:
- ```
- # file: host
- ...
- [szczecin_gitserver]            # group
- git                             # a managed computer, called host
+As example a commented 'hosts' file:
+```
+# file: hosts
+ 
+[berlin_raspbian]               
 
- [szczecin_raspbian]             # different group
- git                             # same host
+[szczecin_gitserver]             # group
+git                              # a managed computer, called host
 
- # gitserver in all locations    
- [gitserver:children]            # group of groups
- szczecin_gitserver
+[szczecin_raspbian]              # different group
+git                              # same host
 
- ...
+# gitserver in all locations
+[gitserver:children]             # group of groups
+szczecin_gitserver
 
- # everything in szczecin        # different group of groups
- [szczecin:children]
- szczecin_gitserver
- szczecin_raspbian
- ```
- As you can see I have grouped my hosts by location (berlin & szczecin), by function (gitserver) and by OS (raspbian). This enables me to link them with variables based on groups, more about that in [Variables](#variables).
+# raspbian installations in all locations
+[raspbian:children]              # different group of groups
+berlin_raspbian
+szczecin_raspbian
+
+# everything in berlin
+[berlin:children]
+berlin_raspbian
+
+# everything in szczecin
+[szczecin:children]
+szczecin_gitserver
+szczecin_raspbian
+```
+As you can see I have grouped my hosts by location (berlin & szczecin), by function (gitserver) and by OS (raspbian). This enables me to link them with variables based on groups, more about that in [Variables](#variables).
  
 #### Playbooks
 The previous mentioned repeatable cooking receipts - on which machine(s) do you want to execute which tasks and what are the environment parameters (details see [Ansible - About Playbooks][ansible-playbooks]).
@@ -180,32 +189,47 @@ For an individualized Git server I would recommend to set at least the following
 # working directory/group_vars/all.yml
 
 #default system user
-ansible_user: link
-# ...
-ssh_public_key: []
+ansible_user:
+
+# list of public SSH keys wich should get permission to connect to host
+ssh_public_key:
 ```
 ```yml
 # working directory/group_vars/raspbian.yml
 
 # system user name
-user_name: link
+user_name:
 ```
 ```yml
 # working directory/group_vars/gitserver.yml
 
+# hostname will change during bootstrapping, provide IP address
 ansible_host:
-ansible_port:
+# custom SSH port
+# password for system user
 user_password_hash:
+# custom SSH port
 ssh_port:
+# password for the dedicated git user
 git_os_user_password_hash:
+# username for git commits
 git_commit_user_name:
+# user email for git commits
 git_commit_user_email:
 ```
 Additionally my play has the option to have Ansible import repos from a backup location. For that follow the instructions in the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine):
 ```yml
 # working directory/group_vars/gitserver.yml
 
+# [optional] create private / public key pair: ssh-keygen -o
+# make public key available on existing git machine (e.g. a backup machine)
+# copy content of the private key file and encrypt it
 git_private_key:
+# git repos on an existing git machine
+# example:
+#    - repo: ssh://link@{{ location_subnet }}.xxx/path/to/repo/ansible.git
+#      dest: /home/git/repos/ansible.git
+#      bare: true
 git_repositories:
 ```
 
