@@ -326,7 +326,7 @@ Our playbook should execute two roles with a certain set of variables.
 * [Molecule docs](https://molecule.readthedocs.io/en/latest/)
 * my git server [work log][worklog]
 
-
+---
 <b id="f1">1</b>: Keep in mind, I neither consider myself an Linux-, Raspberry-, security-, Git- or Ansible-expert. So please let me know about possible improvements and, especially, think twice before you copy-paste security related stuff! [↩](#a1)  
 <b id="f2">2</b>: You can install Ansible on a variety of different Linux distributions or macOS, have a look at the [docs](https://docs.ansible.com/ansible/latest/installation_guide/index.html) [↩](#a2)  
 <b id="f3">3</b>: An older model shouldn't be a problem, I just had that one laying around. [↩](#a3)  
