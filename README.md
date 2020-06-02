@@ -19,6 +19,7 @@ An example using Ansible to set up a private Git server on a Raspberry Pi.
    * [Ansible Speak](#ansible-speak)
    * [Variables](#variables)
    * [Going back to Start](#going-back-to-start)
+   * [And Finish](#and-finish)
 * [Deep Dive](#deep-dive)
    * [Execution Command](#execution-command)
    * [Playbook](#playbook)
@@ -282,8 +283,8 @@ Disclaimer: I ignored variable precedence in my explanations (if you set the sam
 ### Going back to Start
 What? After having finally a running Git server? Yes, but don't, it's quite easy, just repeat the steps of [Prepare your Raspberry Pi](#prepare-your-raspberry-pi) and you are ready to go again.
 
-### Run Ansible
-And now everything you have to do to get a brand new individualized Git server is running (remember to enter *your* encryption password when asked):
+### And Finish
+And now everything you have to do to get a brand new individualized Git server running is executing (remember to enter *your* encryption password when asked):
 ```
 ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt
 ```
