@@ -105,7 +105,7 @@ The following steps are for Ubuntu, for details / other OSs have a look into the
 * download required public roles `ansible-galaxy install -r requirements.yml` (default installation path '/etc/ansible/roles')
 
 ### Network Stuff
-Recommendation: Assign a permanent IP address to your Raspi, probably done via your router. Example for a [AVM FRITZ!Box](https://en.avm.de/products/fritzbox/):
+Recommendation: Assign a permanent IP address to your Raspi, probably done via your router. Example for a [AVM FRITZ!Box](https://en.avm.de/service/fritzbox/fritzbox-7590/knowledge-base/publication/show/201_Configuring-FRITZ-Box-to-always-assign-the-same-IP-address-to-a-network-device/):
 * open a browser, open the Web GUI of your router, address might be something like 'http://192.168.xxx.1'
 * log in with an admin account
 * Home Network -> Network (German GUI says 'Heimnetz -> Netzwerk')
@@ -224,7 +224,7 @@ Our target is named 'git' and a member of the groups 'szczecin-gitserver', 'szcz
 * group_vars: working directory/group_vars/<group name>.yml
 * host_vars: working_directory/host_vars/<host name>.yml
 
-For an individualized Git server I would recommend to set at least the following variables, for more options look into the variable files:
+For an individualized Git server I would recommend to set at least the following variables, for more options look into the variable files (for how to encrypt variables see comments for /group_vars/gitserver.yml/user_password_hash):
 ```yml
 # working directory/group_vars/all.yml
 
@@ -247,6 +247,10 @@ user_name:
 ansible_host:
 # custom SSH port
 # password for system user
+# create: 
+#   * create hash: ansible all -i localhost, -m debug -a "msg={{ 'my_secret_password' | password_hash('sha512') }}"
+#   * encrypt hash: ansible-vault encrypt_string --vault-id git@prompt --stdin-name 'user_password_hash'
+# use in play: ansible-playbook <playbook>.yml --vault-id git@prompt
 user_password_hash:
 # custom SSH port
 ssh_port:
@@ -257,7 +261,7 @@ git_commit_user_name:
 # user email for git commits
 git_commit_user_email:
 ```
-Additionally my play has the option to have Ansible import repos from a backup location. For that follow the instructions in the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine):
+Additionally my play has the option to have Ansible import repos from a backup location. For that follow the instructions in the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine<sup id="a6">[6](#f6)</sup>):
 ```yml
 # working directory/group_vars/gitserver.yml
 
@@ -276,13 +280,18 @@ git_repositories:
 Disclaimer: I ignored variable precedence in my explanations (if you set the same variable in multiple location, for example group_vars & host_vars, which value applies?), please look that up at [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence].
 
 ### Going back to Start
-What? After having finally a running Git server?
+What? After having finally a running Git server? Yes, but don't, it's quite easy, just repeat the steps of [Prepare your Raspberry Pi](#prepare-your-raspberry-pi) and you are ready to go again.
 
-
+### Run Ansible
+And now everything you have to do to get a brand new individualized Git server is running (remember to enter *your* encryption password when asked):
+```
+ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt
+```
+Done - but this time you have your own individualized Git server :-)  
+That also concludes my chapters regarding setting up your own Git server - the next chapters focus more on how to work with Ansible.
 
 
 ## Deep Dive
-
 ### Execution Command
 Lets start with the command we are executing: `ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt`
 * `ansible-playbook gitserver.yml` execute playbook 'gitserver.yml'
@@ -371,6 +380,7 @@ Our playbook should execute two roles with a certain set of variables.
 <b id="f3">3</b>: An older model shouldn't be a problem, I just had that one laying around. [↩](#a3)  
 <b id="f4">4</b>: Your mounting point for the SD Card might differ [↩](#a4)  
 <b id="f5">5</b>: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again. [↩](#a5)  
+<b id="f6">6</b>: The idea is behind deleting the private key is, that user git only has the option to accept inbound connections but has no possibility to initiat outgoing connections. See also [Role gitserver-config](#role-gitserver-config) regarding restricted forwarding / restricted shell. [↩](#a6)  
 
 [ansible-intro]: https://docs.ansible.com/ansible/latest/index.html
 [ansible-install]: https://docs.ansible.com/ansible/latest/installation_guide/index.html
