@@ -1,6 +1,46 @@
 # Ansible Git Server
 An example using Ansible to set up a private Git server on a Raspberry Pi.
 
+## Content
+* [Intro](#intro)
+   * [Why?](#why)
+   * [Tools & Platform](#tools--platform)
+   * [Steps to Take](#steps-to-take)
+* [Preparation](#preparation)
+   * [Prepare your Raspberry Pi](#prepare-your-raspberry-pi)
+   * [Install Ansible](#install-ansible)
+   * [Prepare Work Environment](#prepare-work-environment)
+   * [Network Stuff](#network-stuff)
+* [Getting Started](#getting-started)
+   * [Set IP Address Variables](#set-ip-address-variables)
+   * [Run Ansible](#run-ansible)
+   * [Setting up a Repository on your new Server](#setting-up-a-repository-on-your-new-server)
+* [Getting Useful](#getting-useful)
+   * [Ansible Speak](#ansible-speak)
+   * [Variables](#variables)
+   * [Going back to Start](#going-back-to-start)
+* [Deep Dive](#deep-dive)
+   * [Execution Command](#execution-command)
+   * [Playbook](#playbook)
+   * [Role prepare-raspberry](#role-prepare-raspberry)
+   * [Role set-connection-parameters](#role-set-connection-parameters)
+   * [Role provision-root](#role-provision-root)
+   * [Role rename-user](#role-rename-user)
+   * [Role rename-host](#role-rename-host)
+   * [Role arillso.localization](#role-arillsolocalization)
+   * [Role weareinteractive.apt](#role-weareinteractiveapt)
+   * [Role GROG.reboot](#role-grogreboot)
+   * [Role manala.vim](#role-manalavim)
+   * [Role weareinteractive.users](#role-weareinteractiveusers)
+   * [Role ssh-server-config](#role-ssh-server-config)
+   * [Role weareinteractive.ufw](#role-weareinteractiveufw)
+   * [Role gitserver-config](#role-gitserver-config)
+   * [Role weareinteractive.users - again?](#role-weareinteractiveusers---again)
+   * [Role weareinteractive.git](#role-weareinteractivegit)
+* [Testing](#testing)
+* [Outlook](#outlook)
+* [Sources](#sources)
+
 
 
 ## Intro
@@ -50,7 +90,7 @@ If not stated otherwise all steps have to be done on your Ansible machine, not o
     * delete old host key (IP): `ssh-keygen -f "/home/<username>/.ssh/known_hosts" -R "xxx.xxx.xxx.xxx"`
 * copy ssh public key to your Pi (password raspberry): `ssh-copy-id pi@raspberrypi`
 
-### install Ansible
+### Install Ansible
 The following steps are for Ubuntu, for details / other OSs have a look into the [Ansible docs][ansible-install].
 * `sudo apt update`
 * `sudo apt install software-properties-common`
@@ -59,12 +99,12 @@ The following steps are for Ubuntu, for details / other OSs have a look into the
 * `sudo apt install python3-argcomplete`
 * `sudo activate-global-python-argcomplete3`
 
-### prepare work environment 
+### Prepare Work Environment 
 * create an empty folder, e.g. ansible-gitserver, and cd into said folder
 * `git clone https://github.com/fex01/ansible-gitserver.git ./`
 * download required public roles `ansible-galaxy install -r requirements.yml` (default installation path '/etc/ansible/roles')
 
-### network stuff
+### Network Stuff
 Recommendation: Assign a permanent IP address to your Raspi, probably done via your router. Example for a [AVM FRITZ!Box](https://en.avm.de/products/fritzbox/):
 * open a browser, open the Web GUI of your router, address might be something like 'http://192.168.xxx.1'
 * log in with an admin account
@@ -76,7 +116,7 @@ Recommendation: Assign a permanent IP address to your Raspi, probably done via y
 
 
 
-## Get Started
+## Getting Started
 ### Set IP Address Variables
 For a first test run it's enough to open your ansible-gitserver working directory and change the following values:
 * group_vars/all.yml/ssh_public_keys        # public SSH key of your ansible machine
@@ -98,7 +138,7 @@ And voilà, you have a ready to use private Git server. Credentials are as follo
     * name: git
     * password: my_secret_password
 
-### Setting up a repository on your new server
+### Setting up a Repository on your new Server
 You might want to actually have some repos on your Git server, lets say you want my ansible-gitserver repo on your private server:
 * `ssh link@git` ssh into your Git server with the system account
 * `cd ../git/` change into user gits homefolder
@@ -123,7 +163,7 @@ Let's have a look at the next chapter to change that.
 ## Getting Useful
 An Ansible based setup process would not be very useful if you couldn't change my default values for stuff like user names, passwords, port numbers, etc. ... - thats where Variables come into play. To understand where to set them, we need some common terms.
 
-### ansible speak
+### Ansible Speak
 I aim to keep the vocabulary lessons to a minimum, but lets have a look at three key concepts:
 #### Inventory
 A list of computers managed by Ansible, sorted into groups (details see [Ansible - How to build your inventory][ansible-inventory]).
@@ -237,7 +277,6 @@ Disclaimer: I ignored variable precedence in my explanations (if you set the sam
 
 ### Going back to Start
 What? After having finally a running Git server?
-### Customization
 
 
 
@@ -269,33 +308,33 @@ Our playbook should execute two roles with a certain set of variables.
 
 ### Role prepare-raspberry
 
-#### Role set-connection-parameters
+### Role set-connection-parameters
 
-#### Role provision-root
+### Role provision-root
 
-#### Role rename-user
+### Role rename-user
 
-#### Role rename-host
+### Role rename-host
 
-#### Role arillso.localization
+### Role arillso.localization
 
-#### Role weareinteractive.apt
+### Role weareinteractive.apt
 
-#### Role GROG.reboot
+### Role GROG.reboot
 
-#### Role manala.vim
+### Role manala.vim
 
-#### Role weareinteractive.users
+### Role weareinteractive.users
 
-#### Role ssh-server-config
+### Role ssh-server-config
 
-#### Role weareinteractive.ufw
+### Role weareinteractive.ufw
 
 ### Role gitserver-config
 
-#### Role weareinteractive.users - again?
+### Role weareinteractive.users - again?
 
-#### Role weareinteractive.git
+### Role weareinteractive.git
 
 
 ## Testing
@@ -307,7 +346,7 @@ Our playbook should execute two roles with a certain set of variables.
 
 
 
-## outlook {#outlook}
+## Outlook
 * require password for sudo - probably easy, but I still have to find out how to deal with required sudo passwords in Ansible :sweat_smile:
 * automate testing -> automate builds (travis?)
 * find / create a fitting Raspbian test image for Docker (seems to be non-trivial because of the underlying ARM architecture :thinking:)
