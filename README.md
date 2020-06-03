@@ -24,22 +24,22 @@ An example using Ansible to set up a private Git server on a Raspberry Pi.
    * [Execution Command](#execution-command)
    * [Playbook](#playbook)
    * [Role prepare-raspberry](#role-prepare-raspberry)
-   * [Role set-connection-parameters](#role-set-connection-parameters)
-   * [Role provision-root](#role-provision-root)
-   * [Role rename-user](#role-rename-user)
-   * [Role rename-host](#role-rename-host)
-   * [Role arillso.localization](#role-arillsolocalization)
-   * [Role weareinteractive.apt](#role-weareinteractiveapt)
-   * [Role GROG.reboot](#role-grogreboot)
-   * [Role manala.vim](#role-manalavim)
-   * [Role weareinteractive.users](#role-weareinteractiveusers)
-   * [Role ssh-server-config](#role-ssh-server-config)
-   * [Role weareinteractive.ufw](#role-weareinteractiveufw)
+     * [Role set-connection-parameters](#role-set-connection-parameters)
+     * [Role provision-root](#role-provision-root)
+     * [Role rename-user](#role-rename-user)
+     * [Role rename-host](#role-rename-host)
+     * [Role arillso.localization](#role-arillsolocalization)
+     * [Role weareinteractive.apt](#role-weareinteractiveapt)
+     * [Role GROG.reboot](#role-grogreboot)
+     * [Role manala.vim](#role-manalavim)
+     * [Role weareinteractive.users](#role-weareinteractiveusers)
+     * [Role ssh-server-config](#role-ssh-server-config)
+     * [Role weareinteractive.ufw](#role-weareinteractiveufw)
    * [Role gitserver-config](#role-gitserver-config)
-   * [Role weareinteractive.users - again?](#role-weareinteractiveusers---again)
-   * [Role weareinteractive.git](#role-weareinteractivegit)
+     * [Role weareinteractive.users - again?](#role-weareinteractiveusers---again)
+     * [Role weareinteractive.git](#role-weareinteractivegit)
 * [Testing](#testing)
-* [Outlook](#outlook)
+* [TODO](#todo)
 * [Sources](#sources)
 
 
@@ -281,7 +281,7 @@ git_repositories:
 Disclaimer: I ignored variable precedence in my explanations (if you set the same variable in multiple location, for example group_vars & host_vars, which value applies?), please look that up at [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence].
 
 ### Going back to Start
-What? After having finally a running Git server? Yes, but don't, it's quite easy, just repeat the steps of [Prepare your Raspberry Pi](#prepare-your-raspberry-pi) and you are ready to go again.
+What? After having finally a running Git server? Yes, but don't worry, it's quite easy. Just repeat the steps of [Prepare your Raspberry Pi](#prepare-your-raspberry-pi) and you are ready to go again.
 
 ### And Finish
 And now everything you have to do to get a brand new individualized Git server running is executing (remember to enter *your* encryption password when asked):
@@ -356,7 +356,7 @@ Our playbook should execute two roles with a certain set of variables.
 
 
 
-## Outlook
+## TODO
 * require password for sudo - probably easy, but I still have to find out how to deal with required sudo passwords in Ansible :sweat_smile:
 * automate testing -> automate builds (travis?)
 * find / create a fitting Raspbian test image for Docker (seems to be non-trivial because of the underlying ARM architecture :thinking:)
