@@ -381,7 +381,7 @@ Our playbook should execute two roles with a certain set of variables.
 <b id="f3">3</b>: An older model shouldn't be a problem, I just had that one laying around. [↩](#a3)  
 <b id="f4">4</b>: Your mounting point for the SD Card might differ [↩](#a4)  
 <b id="f5">5</b>: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again. [↩](#a5)  
-<b id="f6">6</b>: The idea is behind deleting the private key is, that user git only has the option to accept inbound connections but has no possibility to initiat outgoing connections. See also [Role gitserver-config](#role-gitserver-config) regarding restricted forwarding / restricted shell. [↩](#a6)  
+<b id="f6">6</b>: The idea is that, after initial cloning, your Git server should not be able to access your backup source. To create backups a backup machine should pull from your Git server, e.g. via cron job. [↩](#a6)  
 
 [ansible-intro]: https://docs.ansible.com/ansible/latest/index.html
 [ansible-install]: https://docs.ansible.com/ansible/latest/installation_guide/index.html
