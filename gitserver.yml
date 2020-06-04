@@ -1,0 +1,13 @@
+# invoke with `ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt`
+
+- name: playbook to set up a git server
+  hosts: gitserver
+  gather_facts: false
+  debugger: on_failed
+  become: true
+
+  tasks:
+  - include_role: 
+      name: prepare-raspberry
+  - include_role: 
+      name: gitserver-config

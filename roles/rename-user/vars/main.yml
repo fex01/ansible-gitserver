@@ -1,0 +1,15 @@
+---
+# vars file for rename-user
+# It should not be necessary to change / override any of the variables defined here
+# Variables which should be customized are under ../defaults/main
+
+# list of files in which the username will be changed
+# for a default Raspbian Lite installation you don't have to change this list
+username_files:
+  - /etc/passwd
+  - /etc/group
+  - /etc/shadow
+  - /etc/gshadow
+  - /etc/sudoers
+  - /etc/systemd/system/autologin@.service
+  - /etc/sudoers.d/010_pi-nopasswd

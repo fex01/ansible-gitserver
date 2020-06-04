@@ -1,0 +1,19 @@
+---
+# tasks file for rename-host
+
+- name: change hostname to '{{ host_name }}'
+  hostname:
+    name: '{{ host_name }}'
+  register: hostname_change
+
+- name: update /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^127\.0\.0\.1'
+    line: "127.0.0.1{{'\t'}}{{ host_name }}"
+    backup: true
+    state: present
+
+- name: reboot host
+  reboot:
+  when: host_reboot | bool

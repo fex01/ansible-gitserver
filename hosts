@@ -1,0 +1,27 @@
+# file: hosts
+
+[berlin_raspbian]
+
+[szczecin_gitserver]
+git
+
+[szczecin_raspbian]
+git
+
+# gitserver in all locations
+[gitserver:children]
+szczecin_gitserver
+
+# raspbian installations in all locations
+[raspbian:children]
+berlin_raspbian
+szczecin_raspbian
+
+# everything in berlin
+[berlin:children]
+berlin_raspbian
+
+# everything in szczecin
+[szczecin:children]
+szczecin_gitserver
+szczecin_raspbian

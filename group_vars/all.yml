@@ -1,0 +1,17 @@
+---
+# group_vars file for all
+
+# default system user
+ansible_user: link
+
+############################################################
+########################Bootstrapping#######################
+############################################################
+
+# SSH
+# List your SSH keys here, one per line. Be sure to remove the '[]',
+# if you add dependencies to this list.
+# Note: The first of these keys needs to be one that Ansible is using.
+ssh_public_keys: []
+# String to present when connecting to host over ssh
+ssh_banner: "Welcome to {{ user_name }}'s {{ host_name }} server\n"

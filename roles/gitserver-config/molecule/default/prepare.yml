@@ -1,0 +1,20 @@
+---
+- name: Prepare
+  hosts: all
+
+  vars:
+    apt_upgrade: true
+    apt_packages:
+      - openssh-server
+      - vim
+
+  tasks:
+    - name: "install necessary packages"
+      include_role:
+        name: "weareinteractive.apt"
+    - name: "create user {{ user_name }}"
+      include_role:
+        name: "weareinteractive.users"
+      vars:
+        users:
+          - username: "{{ user_name }}"

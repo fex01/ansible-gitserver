@@ -1,0 +1,5 @@
+---
+# defaults file for provision-root
+
+# Public key used by ansible - role will fail if the key is not provided
+root_key:

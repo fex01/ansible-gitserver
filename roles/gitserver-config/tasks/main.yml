@@ -1,0 +1,55 @@
+---
+# tasks file for gitserver-config
+
+- name: "create user {{ git_os_user_name }} and add {{ system_user }} to group {{ git_os_user_name }}"
+  include_role:
+    name: "weareinteractive.users"
+  vars:
+    users:
+      - username: "{{ git_os_user_name }}"
+        password: "{{ git_os_user_password_hash }}"
+        shell: "{{ git_os_user_shell }}"
+        ssh_key: "{{ git_private_key }}"
+        authorized_keys: "{{ git_authorized_keys }}"
+      - username: "{{ system_user }}"
+        groups: ["{{ git_os_user_name }}"]
+        append: true
+
+- name: "restrict SSH access for user {{ git_os_user_name }}"
+  replace:
+    path: /home/{{ git_os_user_name }}/.ssh/authorized_keys
+    regexp: '\b^ssh-rsa\b'
+    replace: 'no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa'
+
+- name: "mkdir /home/{{ git_os_user_name }}/git-shell-commands"
+  file:
+    path: /home/{{ git_os_user_name }}/git-shell-commands
+    state: directory
+    owner: "{{ git_os_user_name }}"
+    group: "{{ git_os_user_name }}"
+
+- name: "add no-interactive-login script for {{ git_os_user_name }}"
+  template:
+    src: no-interactive-login.j2
+    dest: /home/{{ git_os_user_name }}/git-shell-commands/no-interactive-login
+    owner: git
+    group: git
+    mode: u+x
+
+- name: "install and configure application git"
+  include_role:
+    name: "weareinteractive.git"
+  vars:
+    git_accept_hostkey: yes
+    git_key_file: "/home/{{ git_os_user_name }}/.ssh/id_rsa"
+    git_owner: "{{ git_os_user_name }}"
+    git_group: "{{ git_os_user_name }}"
+    git_config:
+      user:
+        name: "{{ git_commit_user_name }}"
+        email: "{{ git_commit_user_email }}"
+
+- name: "remove user {{ git_os_user_name }}s private ssh key"
+  file:
+    path: /home/{{ git_os_user_name }}/.ssh/id_rsa
+    state: absent

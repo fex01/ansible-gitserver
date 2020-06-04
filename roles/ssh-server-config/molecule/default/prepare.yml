@@ -1,0 +1,14 @@
+---
+- name: Prepare
+  hosts: all
+
+  vars:
+    apt_upgrade: true
+    apt_packages:
+      - openssh-server
+      - vim
+
+  tasks:
+    - name: "Include weareinteractive.apt"
+      include_role:
+        name: "weareinteractive.apt"

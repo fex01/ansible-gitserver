@@ -1,0 +1,18 @@
+---
+# defaults file for ssh-server-config
+
+# grant SSH access only for
+ssh_users: 
+  - pi
+# path to SSH server config file
+ssh_sshd_config: "/etc/ssh/sshd_config"
+# Change to a port of your choice
+ssh_port: 22
+# String to present when connecting to host over ssh
+ssh_banner:
+# Basic sshd config will be done, use this to set additional values.
+# Syntax:
+#   - var_name: "<settings name>"
+#     value: "<settings value>"
+# For details about setting names and values check /etc/ssh/sshd_config.
+ssh_sshd_config_settings: []

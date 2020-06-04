@@ -1,0 +1,107 @@
+---
+# tasks file for ssh-server-config
+
+- name: fail when ssh_users is empty
+  fail:
+    msg: If you would run this role without defining an SSH user, you will no longer have SSH access to {{ inventory_hostname }}!
+  when: ssh_users | length == 0
+
+- name: change default ssh port
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "^#?Port"
+    line: "Port {{ ssh_port }}"
+    state: present
+  notify:
+    - restart sshd
+
+- name: disable ssh remote root login
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify:
+    - restart sshd
+
+- name: enable ssh strict mode
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "^#?StrictModes"
+    line: "StrictModes yes"
+    state: present
+  notify:
+    - restart sshd
+
+- name: disable X11 forwarding
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "^#?X11Forwarding"
+    line: "X11Forwarding no"
+    state: present
+  notify:
+    - restart sshd
+
+- name: disable ssh password login
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - regexp: "^#?PasswordAuthentication"
+      line: "PasswordAuthentication no"
+    - regexp: "^#?ChallengeResponseAuthentication"
+      line: "ChallengeResponseAuthentication no"
+    - regexp: "^#?UsePAM"
+      line: "UsePAM no"
+    - regexp: "^#?PermitEmptyPasswords"
+      line: "PermitEmptyPasswords no"
+  notify:
+    - restart sshd
+
+- name: set ssh allowed users to {{ ssh_users }}
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "^#?AllowUsers"
+    line: "AllowUsers {{ ssh_users | join(' ') }}"
+  notify:
+    - restart sshd
+
+- name: add ssh banner info
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "^#?Banner"
+    line: "Banner /etc/issue.net"
+    state: present
+  notify:
+    - restart sshd
+
+- name: update ssh banner
+  copy:
+    content: "{{ ssh_banner }}"
+    dest: /etc/issue.net
+  when: ssh_banner != None
+  notify:
+    - restart sshd
+
+- name: set additional values
+  lineinfile:
+    dest: "{{ ssh_sshd_config }}"
+    regexp: "^#?{{ item.var_name }}"
+    line: "{{ item.var_name }} {{ item.value }}"
+    state: present
+  with_items: "{{ ssh_sshd_config_settings }}"
+  notify:
+    - restart sshd
+
+# We notified "Restart sshd" if we modified the sshd config.
+# By calling flush_handlers, we make sure the handler is run *right now*
+- name: Ensure SSH is reloaded if need be
+  meta: flush_handlers
+
+  # We're done, make sure ansible_port is set properly so that any tasks
+# after this use the right ansible_port.
+- name: Ensure we use the configured SSH port for the remainder of the role
+  set_fact:
+    ansible_port: "{{ ssh_port }}"

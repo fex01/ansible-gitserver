@@ -1,0 +1,12 @@
+---
+# tasks file for provision-root
+
+- name: fail if root_key is undefined
+  fail:
+    msg: Variable root_key is undefined!
+  when: root_key is undefined
+
+- name: provision root with ssh key
+  authorized_key:
+    user: root
+    key: '{{ root_key }}'

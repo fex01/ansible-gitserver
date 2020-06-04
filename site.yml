@@ -1,0 +1,3 @@
+# invoke with ansible-playbook gitserver.yml -i <site>.yml
+
+- import_playbook: gitserver.yml

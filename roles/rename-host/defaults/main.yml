@@ -1,0 +1,7 @@
+---
+# defaults file for rename-host
+
+# Change to the hostname of your choice
+host_name: "raspberrypi"
+# Reboot after renaming
+host_reboot: true

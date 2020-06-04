@@ -1,0 +1,7 @@
+---
+# vars file for set-connection-parameters
+# It should not be necessary to change / override any of the variables defined here
+# Variables which should be customized are under ../defaults/main
+
+# Default user
+connection_default_user: pi

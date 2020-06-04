@@ -1,0 +1,8 @@
+---
+# group_vars file for berlin
+
+# human readable site name
+location_name: berlin
+# IP prefix for hosts in this site, if the IP of your computer would be 
+# 192.168.178.39, set the variable to 192.168.178
+location_subnet:

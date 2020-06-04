@@ -1,0 +1,11 @@
+---
+# defaults file for set-connection-parameters
+
+# Change to the SSH port of your choice
+connection_custom_port: 22
+
+# Change to the user name of your choice
+connection_custom_user: pi
+
+# Should facts be gathered after connection parameters are validated?
+gather_facts: true

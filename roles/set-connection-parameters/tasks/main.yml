@@ -1,0 +1,97 @@
+---
+# tasks file for set-connection-parameters
+
+# From localhost, check if we're able to reach {{ inventory_hostname }} on
+# port 22
+- name: Check if we're using the default SSH port
+  become: false
+  wait_for:
+    port: "22"
+    state: "started"
+    host: "{{ ansible_host | default(inventory_hostname) }}"
+    connect_timeout: "5"
+    timeout: "10"
+  delegate_to: "localhost"
+  ignore_errors: "yes"
+  register: default_ssh
+
+# If reachable, continue the following tasks with this port
+- name: Set inventory ansible_port to default
+  set_fact:
+    ansible_port: "22"
+  when: default_ssh is defined and
+        default_ssh.state is defined and
+        default_ssh.state == "started"
+  register: connection_default_port_set
+
+# If unreachable on port 22, check if we're able to reach
+# {{ inventory_hostname }} on {{ connection_custom_port }} provided by the configuration
+# from localhost
+- name: Check if we're using the custom SSH port
+  become: false
+  wait_for:
+    port: "{{ connection_custom_port }}"
+    state: "started"
+    host: "{{ ansible_host | default(inventory_hostname) }}"
+    connect_timeout: "5"
+    timeout: "10"
+  delegate_to: "localhost"
+  ignore_errors: "yes"
+  register: custom_ssh
+  when: default_ssh is defined and
+        default_ssh.state is undefined
+
+# If {{ connection_custom_port }} is reachable, we set it as ansible_port
+- name: Set ansible_port to custom port {{ connection_custom_port }}
+  set_fact:
+    ansible_port: "{{ connection_custom_port }}"
+  when: custom_ssh is defined and
+        custom_ssh.state is defined and
+        custom_ssh.state == "started"
+  register: connection_custom_port_set
+
+# If the SSH port is neither the default or the configured, give up.
+- name: Fail if SSH port was not auto-detected (unknown)
+  fail:
+    msg: "The SSH port is neither 22 or {{ connection_custom_port }}."
+  when: connection_default_port_set is defined and
+        connection_default_port_set.skipped is defined and
+        connection_custom_port_set is defined and
+        connection_custom_port_set.skipped is defined
+
+# Set ansible_user to {{ connection_default_user }}
+- name: Set ansible_user to {{ connection_default_user }}
+  set_fact:
+    ansible_user: "{{ connection_default_user }}"
+
+# Test for the default or custom user
+# First test connection with default user pi
+- name: ping with default user {{ connection_default_user }}
+  ping:
+  register: default_user
+  ignore_unreachable: true
+
+# If connection with connection_default_user failed set ansible_user to connection_custom_user
+- name: Set ansible_user to {{ connection_custom_user }}
+  set_fact:
+    ansible_user: "{{ connection_custom_user }}"
+  when: default_user.ping is undefined
+
+# and test the connection again
+- name: ping with custom user {{connection_custom_user}}
+  ping:
+  register: custom_user
+  ignore_unreachable: true
+  when: default_user.ping is undefined
+
+# If the user name is neither the default or the custom user name, give up.
+- name: Fail if both {{ connection_default_user }} and {{connection_custom_user}} where not able to connect
+  fail:
+    msg: "Neither {{ connection_default_user }} nor {{connection_custom_user}} can connect."
+  when: default_user.ping is undefined and
+        custom_user.ping is undefined
+
+# with validated connection parameters we can gather facts
+- name: gather facts
+  gather_facts:
+  when: gather_facts | bool

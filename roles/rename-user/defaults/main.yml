@@ -1,0 +1,20 @@
+---
+# defaults file for rename-user
+
+# Name that should be changed
+user_name_old: pi
+# Username of your choice
+user_name_new: link
+# Password for your user - if you leave this empty the password will not be changed
+user_password_hash:
+# Its necessary to use a second account to rename an account. This
+# could be done with root or a different sudo-account
+user_executing_account: root
+# If your play should go on after this role fails to connect to the host,
+# set this to true.
+# This might be useful if you are sure this role would fail on a rerun due to changed
+# security settings later on in your play.
+# Example:
+# - you run this role as root (user_executing_account: root)
+# - later on in your play you set the sshd-setting 'PermitRootLogin no'
+user_ignore_connection_errors: false

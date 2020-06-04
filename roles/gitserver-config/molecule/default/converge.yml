@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  debugger: on_failed
+
+  tasks:
+    - name: "Include gitserver-config"
+      include_role:
+        name: "gitserver-config"

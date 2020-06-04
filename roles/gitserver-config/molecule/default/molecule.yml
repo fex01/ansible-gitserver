@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: docker
+platforms:
+  - name: git-molecule
+    image: docker.io/pycontribs/debian:latest
+    pre_build_image: true
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: prepare.yml
+  inventory:
+    links:
+      hosts: hosts
+      host_vars: ./
+verifier:
+  name: ansible

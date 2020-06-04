@@ -1,0 +1,19 @@
+# file: host
+
+[szczecin_gitserver]
+git-molecule
+
+[szczecin_raspbian]
+git-molecule
+
+# gitserver in all locations
+[gitserver:children]
+szczecin_gitserver
+
+# raspbian installations in all locations
+[raspbian:children]
+szczecin_raspbian
+
+# everything in szczecin
+[szczecin:children]
+szczecin_gitserver

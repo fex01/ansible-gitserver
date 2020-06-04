@@ -1,0 +1,7 @@
+- src: arillso.localization
+- src: GROG.reboot
+- src: manala.vim
+- src: weareinteractive.apt
+- src: weareinteractive.git
+- src: weareinteractive.ufw
+- src: weareinteractive.users

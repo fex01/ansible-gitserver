@@ -1,0 +1,53 @@
+---
+# tasks file for rename-user
+
+- name: set {{ user_executing_account }} as ansible_user
+  set_fact:
+    ansible_user: "{{ user_executing_account }}"
+
+- name: test connection
+  ping:
+  register: connection_established
+  ignore_unreachable: true
+
+- name: handle connection errors
+  block:
+    - name: rename user {{ user_name_old }}
+      replace:
+        path: '{{ item }}'
+        regexp: '\b{{ user_name_old }}\b'
+        replace: '{{ user_name_new }}'
+      with_items: '{{ username_files }}'
+
+    - name: check presence of '/home/{{ user_name_old }}' directory
+      stat:
+        path: '/home/{{ user_name_old }}'
+      register: old_home_dir
+
+    - name: move user home directory
+      command: 'mv /home/{{ user_name_old }} /home/{{ user_name_new }}'
+      when: old_home_dir.stat.exists and not old_home_dir.stat.islnk
+
+    - name: check presence of '/home/{{ user_name_new }}' directory
+      stat:
+        path: '/home/{{ user_name_new }}'
+      register: new_home_dir
+
+    - name: symlink to old directory
+      file:
+        src: '/home/{{ user_name_new }}'
+        path: '/home/{{ user_name_old }}'
+        state: 'link'
+      when: new_home_dir.stat.exists
+
+    - name: change user password
+      user:
+        name: '{{ user_name_new }}'
+        password: '{{ user_password_hash }}'
+      when: user_password_hash is defined
+  when: connection_established.ping is defined or
+        not user_ignore_connection_errors
+
+- name: set {{ user_name_new }} as ansible_user
+  set_fact:
+    ansible_user: "{{ user_name_new }}"

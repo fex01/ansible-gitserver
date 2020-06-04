@@ -1,0 +1,68 @@
+---
+# group_vars file for raspbian
+
+############################################################
+########################Bootstrapping#######################
+############################################################
+
+# The system timezone
+localization_timezone: "Europe/Berlin"
+
+# upgrade system: safe | full | dist | no
+apt_upgrade: full
+# Do “apt-get upgrade –download-only” every n-days (0=disable)
+apt_download_upgradeable_packages: 1
+# Do “apt-get autoclean” every n-days (0=disable)
+apt_auto_clean_interval: 1
+# Split the upgrade into the smallest possible chunks so that
+# they can be interrupted with SIGUSR1. This makes the upgrade
+# a bit slower but it has the benefit that shutdown while a upgrade
+# is running is possible (with a small delay)
+apt_unattended_upgrades_minimal_steps: yes
+# Send email to this address for problems or packages upgrades
+# If empty or unset then no email is sent, make sure that you
+# have a working mail setup on your system. A package that provides
+# 'mailx' must be installed. E.g. "user@example.com"
+apt_mails: []
+# Automatically reboot *WITHOUT CONFIRMATION*
+# if the file /var/run/reboot-required is found after the upgrade
+apt_unattended_upgrades_automatic_reboot: yes
+# If automatic reboot is enabled and needed, reboot at the specific
+# time instead of immediately
+# Values: now | 02:00 | ...
+apt_unattended_upgrades_automatic_reboot_time: 03:00
+
+# set manala.vim config to development
+manala_vim_config_template: config/default.dev.j2
+# set additional config options for vim
+manala_vim_config:
+  - incsearch:  true  # Search as soon as characters are entered
+  - hlsearch:   true  # Highlight search results
+
+# SSH
+# Basic sshd config will be done, use this to set additional values
+ssh_sshd_config_settings:
+  - var_name: "MaxAuthTries"
+    value: "3"
+  - var_name: "PubkeyAuthentication"
+    value: "yes"
+  - var_name: "AuthorizedKeysFile"
+    value: ".ssh/authorized_keys"
+  - var_name: "IgnoreUserKnownHosts"
+    value: "yes"
+  - var_name: "IgnoreRhosts"
+    value: "yes"
+  - var_name: "AllowAgentForwarding"
+    value: "no"
+  - var_name: "AllowTcpForwarding"
+    value: "no"
+  - var_name: "GatewayPorts"
+    value: "no"
+  - var_name: "PermitTTY"
+    value: "yes"
+  - var_name: "Protocol"
+    value: "2"
+
+# UFW rules should always allow SSH to keep Ansible functioning
+ufw_rules:
+  - { rule: "allow", port: "{{ ssh_port }}", proto: "tcp", comment: 'SSH' }

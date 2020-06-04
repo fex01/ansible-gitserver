@@ -1,0 +1,13 @@
+---
+# host_vars file for git-molecule
+
+ansible_host: git-molecule
+ansible_user: root
+git_os_user_password_hash: "{{ 'git' | password_hash('sha512') }}"
+git_private_key: |+
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  nothing
+  -----END OPENSSH PRIVATE KEY-----
+
+##################################################################
+molecule_test: true

@@ -1,0 +1,84 @@
+---
+# group_vars file for gitserver
+
+# hostname will change during bootstrapping, provide IP address
+ansible_host: "{{ location_subnet }}.xxx"
+# custom SSH port
+ansible_port: 22
+
+############################################################
+########################Bootstrapping#######################
+############################################################
+
+# main part of the config is in group_vars/raspbian
+
+# system user name
+user_name: "fex"
+# password for system user
+# create: 
+#   * create hash: ansible all -i localhost, -m debug -a "msg={{ 'my_secret_password' | password_hash('sha512') }}"
+#   * encrypt hash: ansible-vault encrypt_string --vault-id git@prompt --stdin-name 'user_password_hash'
+# use in play: ansible-playbook <playbook>.yml --vault-id git@prompt
+# default: my_secret_password
+user_password_hash: !vault |
+          $ANSIBLE_VAULT;1.2;AES256;git
+          30353034663832306561386562646531393963613862376165363830363631666562616333313161
+          3135376661616438613666626163363561363637303934320a636534323336386137343863356430
+          61336662626266663431323837346433626336616635616365326164386330393630303561626235
+          3663356533303933630a316433333333666638303430666463333539643163396530333061656334
+          39643263623731646132616334383931623534643736313337613437653930613965383563646633
+          37613331613965366230326331383632386231613734333061636464376232356133616265623666
+          33613831383765386364343037633766643932326533313138633439373239306165613337666235
+          31643664633034366132613537343561613064303437376335323231363633353966613039656237
+          36656437656139633436303133383564656666363165323430613961623839353135
+
+# SSH
+# grant SSH access only for
+ssh_users: 
+  - "{{ user_name }}"
+  - "{{ git_os_user_name }}"
+# custom SSH port
+ssh_port: 22
+
+
+############################################################
+#########################Gitserver##########################
+############################################################
+
+# to be added to group {{ git_os_user_name }}
+system_user: "{{ user_name }}"
+# git connections will not be done with the system user but with a dedicated git user
+git_os_user_name: git
+# password for the dedicated git user
+# create / use: see {{ user_password_hash }}
+# default: my_secret_password
+git_os_user_password_hash: !vault |
+          $ANSIBLE_VAULT;1.2;AES256;git
+          63646562306132663136313561626662363432633731346135376566643764333662613062343365
+          3763343536363731646566346433393864323336646335660a376231336236653461376530646165
+          62346266333435336232626265373735643931333066626137656432356433303664353735393134
+          3565333631316134320a613732306566333031383962666638323236383566383066613038363936
+          32643963386263643039626637333062313235306638383064313033356638353232626662323631
+          35386264653962343830653032626564343366323736626266323336643632636631613935666631
+          61343732333236636461343632363237636530393539393032343563343234386335393864633865
+          33396137623334643838376639363338373037376235306664386438386237666330313863356463
+          31316638396165666661363830363965613664666665613564393461336132626635
+# username for git commits
+git_commit_user_name: link
+# user email for git commits
+git_commit_user_email: link@example.org
+# [optional]
+# private key will be deploy by w.users to /home/git/.ssh/id_rsa
+#   * create private / public key pair: ssh-keygen -o
+#   * make public key available on existing git machine (e.g. a backup machine)
+#   * copy content of the private key file and encrypt it (see {{ user_password_hash }})
+git_private_key:
+# keys to authorize repo SSH access
+git_authorized_keys: "{{ ssh_public_keys }}"
+# [optional]
+# git repos on an existing git machine
+# example:
+#    - repo: ssh://link@{{ location_subnet }}.xxx/path/to/repo/ansible.git
+#      dest: /home/git/repos/ansible.git
+#      bare: true
+git_repositories: []
