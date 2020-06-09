@@ -1,4 +1,7 @@
-Work in Progress
+Work in Progress, still TODO:
+* [ ] writing #Deep Dive
+* [ ] writing #Testing
+* [ ] test run with pruned & sanitized repo
 
 # Ansible Git Server
 An example using Ansible to set up a private Git server on a Raspberry Pi.
