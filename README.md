@@ -7,7 +7,7 @@ An example using Ansible to set up a private Git server on a Raspberry Pi.
 * [Intro](#intro)
    * [Why?](#why)
    * [Tools & Platform](#tools--platform)
-   * [Steps to Take](#steps-to-take)
+   * [What am I trying to achieve?](#what-am-i-trying-to-achieve)
 * [Preparation](#preparation)
    * [Prepare your Raspberry Pi](#prepare-your-raspberry-pi)
    * [Install Ansible](#install-ansible)
@@ -62,10 +62,11 @@ I decided to take an existing [work log][worklog], to turn it into an Ansible pl
 * target OS: [Raspbian Buster Lite](https://www.raspberrypi.org/downloads/raspbian/)
 * server administration tool: [Ansible 2.9][ansible-intro]
 
-### Steps to Take
-(for details see [work log][worklog])
+### What am I trying to achieve?
+The aim is to take a fresh Raspbian installation, do some hardening, install git and have a ready to use private Git server. The details on how I did that manually you can find in said [work log][worklog], the steps break down to:
 * change username pi to a custom username
 * change the default password
+* require password for sudo<sup id="a4">[4](#f4)</sup>
 * change default hostname
 * SSH hardening
 * auto updates
@@ -84,7 +85,7 @@ If not stated otherwise all steps have to be done on your Ansible machine, not o
 ### Prepare your Raspberry Pi
 * download Raspbian Lite https://www.raspberrypi.org/downloads/
 * write image on SD card https://www.raspberrypi.org/documentation/installation/installing-images/README.md
-    * `touch /Volumes/boot/ssh`<sup id="a4">[4](#f4)</sup> enable SSH by writing an empty file called `ssh` on the boot partition<sup id="a5">[5](#f5)</sup>
+    * `touch /Volumes/boot/ssh`<sup id="a5">[5](#f5)</sup> enable SSH by writing an empty file called `ssh` on the boot partition<sup id="a6">[6](#f6)</sup>
     * eject & insert SD card into your Raspi
     * connect your Raspberry Pi to LAN and power
 * if missing, generate ssh public key on your Ansible machine: `ssh-keygen -o`
@@ -264,7 +265,7 @@ git_commit_user_name:
 # user email for git commits
 git_commit_user_email:
 ```
-Additionally my play has the option to have Ansible import repos from a backup location. For that follow the instructions in the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine<sup id="a6">[6](#f6)</sup>):
+Additionally my play has the option to have Ansible import repos from a backup location. For that follow the instructions in the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine<sup id="a7">[7](#f7)</sup>):
 ```yml
 # working directory/group_vars/gitserver.yml
 
@@ -381,9 +382,10 @@ Our playbook should execute two roles with a certain set of variables.
 <b id="f1">1</b>: Keep in mind, I neither consider myself an Linux-, Raspberry-, security-, Git- or Ansible-expert. So please let me know about possible improvements and, especially, think twice before you copy-paste security related stuff! [↩](#a1)  
 <b id="f2">2</b>: You can install Ansible on a variety of different Linux distributions or macOS, have a look at the [docs](https://docs.ansible.com/ansible/latest/installation_guide/index.html) [↩](#a2)  
 <b id="f3">3</b>: An older model shouldn't be a problem, I just had that one laying around. [↩](#a3)  
-<b id="f4">4</b>: Your mounting point for the SD Card might differ [↩](#a4)  
-<b id="f5">5</b>: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again. [↩](#a5)  
-<b id="f6">6</b>: The idea is that, after initial cloning, your Git server should not be able to access your backup source. To create backups a backup machine should pull from your Git server, e.g. via cron job. [↩](#a6)  
+<b id="f4">4</b>: Thats still on the TODO list for my Ansible play - see also [TODO](#todo) [↩](#a4)
+<b id="f5">5</b>: Your mounting point for the SD Card might differ [↩](#a5)  
+<b id="f6">6</b>: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again. [↩](#a6)  
+<b id="f7">7</b>: The idea is that, after initial cloning, your Git server should not be able to access your backup source. To create backups a backup machine should pull from your Git server, e.g. via cron job. [↩](#a7)  
 
 [ansible-intro]: https://docs.ansible.com/ansible/latest/index.html
 [ansible-install]: https://docs.ansible.com/ansible/latest/installation_guide/index.html
