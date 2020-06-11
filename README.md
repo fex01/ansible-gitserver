@@ -109,7 +109,7 @@ The following steps are for Ubuntu, for details / other OSs have a look into the
 ### Prepare Work Environment 
 * create an empty folder, e.g. ansible-gitserver, and cd into said folder
 * `git clone https://github.com/fex01/ansible-gitserver.git ./`
-* download required public roles `ansible-galaxy install -r requirements.yml` (default installation path '/etc/ansible/roles')
+* download required public roles `ansible-galaxy install -r requirements.yml --role-path ./roles/` into 'working directory/roles'
 
 ### Network Stuff
 Recommendation: Assign a permanent IP address to your Raspi, probably done via your router. Example for a [AVM FRITZ!Box](https://en.avm.de/service/fritzbox/fritzbox-7590/knowledge-base/publication/show/201_Configuring-FRITZ-Box-to-always-assign-the-same-IP-address-to-a-network-device/):
