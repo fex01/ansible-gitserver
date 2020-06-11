@@ -1,7 +1,6 @@
 Work in Progress, still TODO:
 * [ ] writing #Deep Dive
 * [ ] writing #Testing
-* [ ] test run with pruned & sanitized repo
 
 # Ansible Git Server
 An example using Ansible to set up a private Git server on a Raspberry Pi.
@@ -17,7 +16,7 @@ An example using Ansible to set up a private Git server on a Raspberry Pi.
    * [Prepare Work Environment](#prepare-work-environment)
    * [Network Stuff](#network-stuff)
 * [Getting Started](#getting-started)
-   * [Set IP Address Variables](#set-ip-address-variables)
+   * [Minimal Configuration](#minimal-configuration)
    * [Run Ansible](#run-ansible)
    * [Setting up a Repository on your new Server](#setting-up-a-repository-on-your-new-server)
 * [Getting Useful](#getting-useful)
@@ -124,14 +123,14 @@ Recommendation: Assign a permanent IP address to your Raspi, probably done via y
 
 
 ## Getting Started
-### Set IP Address Variables
+### Minimal Configuration
 For a first test run it's enough to open your ansible-gitserver working directory and change the following values:
-* group_vars/all.yml/ssh_public_keys        # public SSH key of your ansible machine
-* group_vars/szczecin.yml/location_subnet
-* group_vars/gitserver.yml/ansible_host     # IP address of your Raspi
+* `working_directory/group_vars/all.yml/ssh_public_keys` - public SSH key of your ansible machine
+* `working_directory/group_vars/szczecin.yml/location_subnet` - network prefix of your LAN
+* `working_directory/group_vars/gitserver.yml/ansible_host` - IP address of your Raspi
 
 ### Run Ansible
-Having done that you could now start the setup process with (default vault password is 'my_secret_password')
+Having done that you could now start the setup process with the following command (default vault password is 'my_secret_password')
 ```
 ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt
 ```
@@ -228,8 +227,8 @@ Instead of writing the same tasks again and again for different playbooks, you c
 ### Variables
 Comming back to variables - while Ansibles knows a number of options where to set them (details see [Ansible - Using Variables][ansible-variables]), the basic option is to link them to machines in your [Inventory](#inventory). 
 Our target is named 'git' and a member of the groups 'szczecin-gitserver', 'szczecin-raspbian', 'gitserver', 'raspbian', 'szczecin' and the special group 'all', which means the variables for all these groups (called group_vars) and the variables for our target (called host_vars) apply. And if you followed [Set IP Address Variables](#set-ip-address-variables), you actually already know where to find them:
-* group_vars: working directory/group_vars/<group name>.yml
-* host_vars: working_directory/host_vars/<host name>.yml
+* group_vars: `working_directory/group_vars/<group name>.yml`
+* host_vars: `working_directory/host_vars/<host name>.yml`
 
 For an individualized Git server I would recommend to set at least the following variables, for more options look into the variable files (for how to encrypt variables see comments for /group_vars/gitserver.yml/user_password_hash):
 ```yml
@@ -238,7 +237,7 @@ For an individualized Git server I would recommend to set at least the following
 #default system user
 ansible_user:
 
-# list of public SSH keys wich should get permission to connect to host
+# List your SSH keys here, one per line.
 ssh_public_key:
 ```
 ```yml
@@ -284,13 +283,13 @@ git_private_key:
 git_repositories:
 ```
 
-Disclaimer: I ignored variable precedence in my explanations (if you set the same variable in multiple location, for example group_vars & host_vars, which value applies?), please look that up at [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence].
+Disclaimer: I ignore variable precedence in my explanations (if you set the same variable in multiple location, for example group_vars & host_vars, which value applies?), please look that up at [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence].
 
 ### Going back to Start
 What? After having finally a running Git server? Yes, but don't worry, it's quite easy. Just repeat the steps of [Prepare your Raspberry Pi](#prepare-your-raspberry-pi) and you are ready to go again.
 
 ### And Finish
-And now everything you have to do to get a brand new individualized Git server running is executing (remember to enter *your* encryption password when asked):
+And now everything you have to do to get a brand new individualized Git server running is executing the following command (remember to enter *your* encryption password when asked):
 ```
 ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt
 ```
@@ -299,6 +298,8 @@ That also concludes my chapters regarding setting up your own Git server - the n
 
 
 ## Deep Dive
+Let's
+
 ### Execution Command
 Lets start with the command we are executing: `ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt`
 * `ansible-playbook gitserver.yml` execute playbook 'gitserver.yml'
