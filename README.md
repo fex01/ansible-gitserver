@@ -26,7 +26,7 @@ An example using Ansible to set up a private Git server on a Raspberry Pi.
    * [And Finish](#and-finish)
 * [Deep Dive](#deep-dive)
    * [Execution Command](#execution-command)
-   * [Playbook](#playbook)
+   * [Roles](#roles)
    * [Role prepare-raspberry](#role-prepare-raspberry)
      * [Role set-connection-parameters](#role-set-connection-parameters)
      * [Role provision-root](#role-provision-root)
@@ -170,12 +170,12 @@ Let's have a look at the next chapter to change that.
 An Ansible based setup process would not be very useful if you couldn't change my default values for stuff like user names, passwords, port numbers, etc. ... - thats where Variables come into play. To understand where to set them, we need some common terms.
 
 ### Ansible Speak
-I aim to keep the vocabulary lessons to a minimum, but lets have a look at three key concepts:
+I aim to keep the vocabulary lessons to a minimum, but lets have a look at two key concepts:
 #### Inventory
 A list of computers managed by Ansible, sorted into groups (details see [Ansible - How to build your inventory][ansible-inventory]).
 As example a commented 'hosts' file:
 ```
-# file: hosts
+# working_directory/hosts
  
 [berlin_raspbian]               
 
@@ -203,12 +203,13 @@ berlin_raspbian
 szczecin_gitserver
 szczecin_raspbian
 ```
-As you can see I have grouped my hosts by location (berlin & szczecin), by function (gitserver) and by OS (raspbian). This enables me to link them with variables based on groups, more about that in [Variables](#variables).
- 
+As you can see I have grouped my hosts by location (berlin & szczecin), by function (gitserver) and by OS (raspbian). This enables me to link them with variables based on groups, more about that in [Variables](#variables). 
 #### Playbooks
 The previous mentioned repeatable cooking receipts - on which machine(s) do you want to execute which tasks and what are the environment parameters (details see [Ansible - About Playbooks][ansible-playbooks]).
 Example: gitserver.yml
 ```yml
+# working_directory/gitserver.yml
+
 - name: playbook to set up a git server     # name of your play
   hosts: gitserver                          # group of machines to which to apply this play
   gather_facts: false                       # \
@@ -221,8 +222,6 @@ Example: gitserver.yml
   - include_role: 
     name: gitserver-config
 ```
-#### Roles
-Instead of writing the same tasks again and again for different playbooks, you can bundle tasks into roles (details see [Ansible - Roles][ansible-roles]). But the biggest advantage of roles is that they are sharable - just have a look at [Ansible Galaxy][ansible-galaxy] to find roles for almost all common tasks.
 
 ### Variables
 Comming back to variables - while Ansibles knows a number of options where to set them (details see [Ansible - Using Variables][ansible-variables]), the basic option is to link them to machines in your [Inventory](#inventory). 
@@ -232,7 +231,7 @@ Our target is named 'git' and a member of the groups 'szczecin-gitserver', 'szcz
 
 For an individualized Git server I would recommend to set at least the following variables, for more options look into the variable files (for how to encrypt variables see comments for /group_vars/gitserver.yml/user_password_hash):
 ```yml
-# working directory/group_vars/all.yml
+# working_directory/group_vars/all.yml
 
 #default system user
 ansible_user:
@@ -241,13 +240,13 @@ ansible_user:
 ssh_public_key:
 ```
 ```yml
-# working directory/group_vars/raspbian.yml
+# working_directory/group_vars/raspbian.yml
 
 # system user name
 user_name:
 ```
 ```yml
-# working directory/group_vars/gitserver.yml
+# working_directory/group_vars/gitserver.yml
 
 # hostname will change during bootstrapping, provide IP address
 ansible_host:
@@ -269,7 +268,7 @@ git_commit_user_email:
 ```
 Additionally my play has the option to have Ansible import repos from a backup location. For that follow the instructions in the comments and set the following variables (after initial import the private key will be deleted from the new Git server, you have to delete the public key manually from your backup machine<sup id="a7">[7](#f7)</sup>):
 ```yml
-# working directory/group_vars/gitserver.yml
+# working_directory/group_vars/gitserver.yml
 
 # [optional] create private / public key pair: ssh-keygen -o
 # make public key available on existing git machine (e.g. a backup machine)
@@ -306,22 +305,8 @@ Lets start with the command we are executing: `ansible-playbook gitserver.yml -i
 * `-i ./hosts` use the file 'hosts' in the current directory as inventory
 * `--vault-id git@prompt` this play has encrypted variables, ask me for the decryption password, password hint is 'git'
 
-### Playbook
-So we are executing a playbook, what does it do?
-```yml
-- name: playbook to set up a git server     # name of your play
-  hosts: gitserver                          # group of machines to which to apply this play
-  gather_facts: false                       # \
-  debugger: on_failed                       # - optional parameters
-  become: true                              # / 
-
-  tasks:                                    # list of tasks
-  - include_role: 
-    name: prepare-raspberry
-  - include_role: 
-    name: gitserver-config
-```
-Our playbook should execute two roles with a certain set of variables.
+### Roles
+Instead of writing the same tasks again and again for different playbooks, you can bundle tasks into roles (details see [Ansible - Roles][ansible-roles]). But the biggest advantage of roles is that they are sharable - just have a look at [Ansible Galaxy][ansible-galaxy] to find roles for almost all common tasks.
 
 ### Role prepare-raspberry
 
