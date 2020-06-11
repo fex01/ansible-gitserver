@@ -297,7 +297,7 @@ That also concludes my chapters regarding setting up your own Git server - the n
 
 
 ## Deep Dive
-Let's
+This chapter will look into whats actually happening when you execute your playbook, explain on a general level how [Roles](#roles) are structured and then take a dive into the roles we use for this project.
 
 ### Execution Command
 Lets start with the command we are executing: `ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt`
