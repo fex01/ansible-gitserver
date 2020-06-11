@@ -15,11 +15,12 @@
         groups: ["{{ git_os_user_name }}"]
         append: true
 
-- name: "restrict SSH access for user {{ git_os_user_name }}"
+- name: "restrict SSH access for user {{ git_os_user_name }}, skip when no authorized keys are provided"
   replace:
     path: /home/{{ git_os_user_name }}/.ssh/authorized_keys
     regexp: '\b^ssh-rsa\b'
     replace: 'no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa'
+  when: git_authorized_keys|length > 0
 
 - name: "mkdir /home/{{ git_os_user_name }}/git-shell-commands"
   file:
