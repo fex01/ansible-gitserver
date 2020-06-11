@@ -11,7 +11,10 @@ ansible_user: link
 # SSH
 # List your SSH keys here, one per line. Be sure to remove the '[]',
 # if you add dependencies to this list.
-# Note: The first of these keys needs to be one that Ansible is using.
+# ssh_public_keys:
+#   - ssh-rsa xxxxxxxxxxxxxxxxxxxxxxxxx link@my-machine
+# Note: The first of these keys needs to be one that Ansible is using. You get your public SSH key
+# by running `cat ~/.ssh/id_rsa.pub`.
 ssh_public_keys: []
 # String to present when connecting to host over ssh
 ssh_banner: "Welcome to {{ user_name }}'s {{ host_name }} server\n"
