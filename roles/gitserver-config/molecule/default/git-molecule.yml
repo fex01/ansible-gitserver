@@ -3,6 +3,7 @@
 
 ansible_host: git-molecule
 ansible_user: root
+user_name: test
 git_os_user_password_hash: "{{ 'git' | password_hash('sha512') }}"
 git_private_key: |+
   -----BEGIN OPENSSH PRIVATE KEY-----
