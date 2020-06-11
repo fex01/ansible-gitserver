@@ -5,6 +5,8 @@ Work in Progress, still TODO:
 # Ansible Git Server
 An example using Ansible to set up a private Git server on a Raspberry Pi.
 
+
+
 ## Content
 * [Intro](#intro)
    * [Why?](#why)
@@ -21,6 +23,8 @@ An example using Ansible to set up a private Git server on a Raspberry Pi.
    * [Setting up a Repository on your new Server](#setting-up-a-repository-on-your-new-server)
 * [Getting Useful](#getting-useful)
    * [Ansible Speak](#ansible-speak)
+    * [Inventory](#inventory)
+    * [Playbooks](#playbooks)
    * [Variables](#variables)
    * [Going back to Start](#going-back-to-start)
    * [And Finish](#and-finish)
@@ -58,11 +62,15 @@ Since the best way to learn something is
 
 I decided to take an existing [work log][worklog], to turn it into an Ansible play and to document what I did.
 
+
+
 ### Tools & Platform
 * machine with Ansible: running [Ubuntu 18.04 LTS](https://ubuntu.com)<sup id="a2">[2](#f2)</sup>
 * target: [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<sup id="a3">[3](#f3)</sup>
 * target OS: [Raspbian Buster Lite](https://www.raspberrypi.org/downloads/raspbian/)
 * server administration tool: [Ansible 2.9][ansible-intro]
+
+
 
 ### What am I trying to achieve?
 The aim is to take a fresh Raspbian installation, do some hardening, install git and have a ready to use private Git server. The details on how I did that manually you can find in said [work log][worklog], the steps break down to:
@@ -84,6 +92,8 @@ The aim is to take a fresh Raspbian installation, do some hardening, install git
 ## Preparation
 If not stated otherwise all steps have to be done on your Ansible machine, not on the target.
 
+
+
 ### Prepare your Raspberry Pi
 * download Raspbian Lite https://www.raspberrypi.org/downloads/
 * write image on SD card https://www.raspberrypi.org/documentation/installation/installing-images/README.md
@@ -96,6 +106,8 @@ If not stated otherwise all steps have to be done on your Ansible machine, not o
     * delete old host key (IP): `ssh-keygen -f "/home/<username>/.ssh/known_hosts" -R "xxx.xxx.xxx.xxx"`
 * copy ssh public key to your Pi (password raspberry): `ssh-copy-id pi@raspberrypi`
 
+
+
 ### Install Ansible
 The following steps are for Ubuntu, for details / other OSs have a look into the [Ansible docs][ansible-install].
 * `sudo apt update`
@@ -105,10 +117,14 @@ The following steps are for Ubuntu, for details / other OSs have a look into the
 * `sudo apt install python3-argcomplete`
 * `sudo activate-global-python-argcomplete3`
 
+
+
 ### Prepare Work Environment 
 * create an empty folder, e.g. ansible-gitserver, and cd into said folder
 * `git clone https://github.com/fex01/ansible-gitserver.git ./`
 * download required public roles `ansible-galaxy install -r requirements.yml --role-path ./roles/` into 'working directory/roles'
+
+
 
 ### Network Stuff
 Recommendation: Assign a permanent IP address to your Raspi, probably done via your router. Example for a [AVM FRITZ!Box](https://en.avm.de/service/fritzbox/fritzbox-7590/knowledge-base/publication/show/201_Configuring-FRITZ-Box-to-always-assign-the-same-IP-address-to-a-network-device/):
@@ -129,6 +145,8 @@ For a first test run it's enough to open your ansible-gitserver working director
 * `working_directory/group_vars/szczecin.yml/location_subnet` - network prefix of your LAN
 * `working_directory/group_vars/gitserver.yml/ansible_host` - IP address of your Raspi
 
+
+
 ### Run Ansible
 Having done that you could now start the setup process with the following command (default vault password is 'my_secret_password')
 ```
@@ -143,6 +161,8 @@ And voilà, you have a ready to use private Git server. Credentials are as follo
 * git account
     * name: git
     * password: my_secret_password
+
+
 
 ### Setting up a Repository on your new Server
 You might want to actually have some repos on your Git server, lets say you want my ansible-gitserver repo on your private server:
@@ -166,11 +186,17 @@ While this test run was nice to see that Ansible actually does the job, **I woul
 Let's have a look at the next chapter to change that.
 
 
+
 ## Getting Useful
 An Ansible based setup process would not be very useful if you couldn't change my default values for stuff like user names, passwords, port numbers, etc. ... - thats where Variables come into play. To understand where to set them, we need some common terms.
 
+
+
 ### Ansible Speak
 I aim to keep the vocabulary lessons to a minimum, but lets have a look at two key concepts:
+
+
+
 #### Inventory
 A list of computers managed by Ansible, sorted into groups (details see [Ansible - How to build your inventory][ansible-inventory]).
 As example a commented 'hosts' file:
@@ -204,6 +230,9 @@ szczecin_gitserver
 szczecin_raspbian
 ```
 As you can see I have grouped my hosts by location (berlin & szczecin), by function (gitserver) and by OS (raspbian). This enables me to link them with variables based on groups, more about that in [Variables](#variables). 
+
+
+
 #### Playbooks
 The previous mentioned repeatable cooking receipts - on which machine(s) do you want to execute which tasks and what are the environment parameters (details see [Ansible - About Playbooks][ansible-playbooks]).
 Example: gitserver.yml
@@ -222,6 +251,8 @@ Example: gitserver.yml
   - include_role: 
     name: gitserver-config
 ```
+
+
 
 ### Variables
 Comming back to variables - while Ansibles knows a number of options where to set them (details see [Ansible - Using Variables][ansible-variables]), the basic option is to link them to machines in your [Inventory](#inventory). 
@@ -284,8 +315,12 @@ git_repositories:
 
 Disclaimer: I ignore variable precedence in my explanations (if you set the same variable in multiple location, for example group_vars & host_vars, which value applies?), please look that up at [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence].
 
+
+
 ### Going back to Start
 What? After having finally a running Git server? Yes, but don't worry, it's quite easy. Just repeat the steps of [Prepare your Raspberry Pi](#prepare-your-raspberry-pi) and you are ready to go again.
+
+
 
 ### And Finish
 And now everything you have to do to get a brand new individualized Git server running is executing the following command (remember to enter *your* encryption password when asked):
@@ -296,8 +331,11 @@ Done - but this time you have your own individualized Git server :-)
 That also concludes my chapters regarding setting up your own Git server - the next chapters focus more on how to work with Ansible.
 
 
+
 ## Deep Dive
 This chapter will look into whats actually happening when you execute your playbook, explain on a general level how [Roles](#roles) are structured and then take a dive into the roles we use for this project.
+
+
 
 ### Execution Command
 Lets start with the command we are executing: `ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt`
@@ -305,38 +343,145 @@ Lets start with the command we are executing: `ansible-playbook gitserver.yml -i
 * `-i ./hosts` use the file 'hosts' in the current directory as inventory
 * `--vault-id git@prompt` this play has encrypted variables, ask me for the decryption password, password hint is 'git'
 
+
+
 ### Roles
-Instead of writing the same tasks again and again for different playbooks, you can bundle tasks into roles (details see [Ansible - Roles][ansible-roles]). But the biggest advantage of roles is that they are sharable - just have a look at [Ansible Galaxy][ansible-galaxy] to find roles for almost all common tasks.
+Instead of writing the same tasks again and again for different playbooks, you can bundle tasks into roles (details see [Ansible - Roles][ansible-roles]). But the biggest advantage of roles is that they are sharable - just have a look at [Ansible Galaxy][ansible-galaxy] to find roles for almost all common tasks.  
+The default structure of roles is
+```
+my-role/        # folder name is the same as the roles name
+  tasks/        # one to multiple task files       
+  handlers/     # actions that react on notifications
+  files/        # resources
+  templates/  
+  vars/         # variables with high precedence, should normally not be overwritten
+  defaults/     # default values, overwritten by values linked to your inventory
+  meta/         # meta information for Ansible Galaxy
+  README.md     # readme explaining function and usage of the specific role
+```
+If you have a look into the roles in *working_directory/roles/*, you will see that not all roles have all folders. That's no trouble, if a specific role doesn't need, for example, additional resources than the role doesn't need a *files* folder. A prime example of that is my *prepare-raspberry* role - in that folder you will only find the *meta* folder and the *README.md* file.  
+On the other hand your role might have additional folder, for example for testing. An example of that would be my *gitserver-config* role with the added folder *molecule* (more about testing and Molecule in [Testing](#testing)).  
+If you take an existing role, e.g. from [Ansible Galaxy][ansible-galaxy], the way to customize role execution is by overwriting default variables in *role_name/default/main.yml*, for example by having the same variable name with a customized value in your group_vars. An example in this project would be *user_name*. You will find that variable in *working_directory/roles/prepare-raspberry/defaults/main.yml*, but since the variable is also set in *working_directory/group_vars/gitserver.yml* the default value will be overwritten by whatever you set in *working_directory/group_vars/gitserver.yml* (details about precedence see [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence]).  
+To avoid ambiguity - you don't change anything inside the roles folder. You overwrite role defaults by having the same variable_name linked to your inventory.
 
-### Role prepare-raspberry
+You might remember from [Playbooks](#playbooks), that our play include two roles, [Role prepare-raspberry](#role-prepare-raspberry) and [Role gitserver-config](#role-gitserver-config), so lets have a look what they actually do.
 
-### Role set-connection-parameters
 
-### Role provision-root
 
-### Role rename-user
+### Role prepare-raspberry 
+After explaining roles in theory - we will start with a role that has not so much to do with standard roles. A look into the role folder already shows that something is strange `working_directory/roles/prepare-raspberry`:
+```
+prepare-raspberry/
+  defaults/
+  meta/
+  README.md
+```
+The explanation is simple - *prepare-raspberry* is nothing more than a wrapper for a number of different subroles, called dependencies ([Ansible - Role Dependencies][ansible-dependencies]). Thats why *prepare-raspberry* does not even have a *tasks* folder, all 'functionality' is contained in the dependencies section of `prepare-raspberry/meta/main.yml`
+```yml
+[...]
+dependencies:
+  # List your role dependencies here, one per line. Be sure to remove the '[]' above,
+  # if you add dependencies to this list.
+    - role: set-connection-parameters
+      vars:
+        connection_custom_port: "{{ ssh_port }}"
+        connection_custom_user: "{{ user_name }}"
+    - role: provision-root
+      vars:
+        root_key: "{{ ssh_public_keys | first }}"
+    - role: rename-user
+      vars:
+        user_name_new: "{{ user_name }}"
+        user_ignore_connection_errors: true
+    - role: rename-host
+      vars:
+        host_reboot: true
+    - role: arillso.localization
+      vars:
+        localization_timezone_linux: "{{ localization_timezone }}"
+    - role: weareinteractive.apt
+    - role: GROG.reboot
+    - role: manala.vim
+    - role: weareinteractive.users
+      vars:
+        users:
+          - username: "{{ user_name }}"
+            authorized_keys: "{{ ssh_public_keys }}"
+    - role: ssh-server-config
+    - role: weareinteractive.ufw
+```
+So the role *prepare-raspberry* is not exactly necessary, it's just a convenient way to wrap a number of common roles that I would apply to all Raspberry installation in one role. To see what's actually done we have to dive deeper into the dependencies.
 
-### Role rename-host
 
-### Role arillso.localization
 
-### Role weareinteractive.apt
+#### Role set-connection-parameters
 
-### Role GROG.reboot
 
-### Role manala.vim
 
-### Role weareinteractive.users
 
-### Role ssh-server-config
+#### Role provision-root
 
-### Role weareinteractive.ufw
+
+
+
+#### Role rename-user
+
+
+
+
+#### Role rename-host
+
+
+
+
+#### Role arillso.localization
+
+
+
+
+#### Role weareinteractive.apt
+
+
+
+
+#### Role GROG.reboot
+
+
+
+
+#### Role manala.vim
+
+
+
+
+#### Role weareinteractive.users
+
+
+
+
+#### Role ssh-server-config
+
+
+
+
+#### Role weareinteractive.ufw
+
+
+
 
 ### Role gitserver-config
 
-### Role weareinteractive.users - again?
 
-### Role weareinteractive.git
+
+
+#### Role weareinteractive.users - again?
+
+
+
+
+#### Role weareinteractive.git
+
+
 
 
 ## Testing
@@ -358,6 +503,7 @@ Instead of writing the same tasks again and again for different playbooks, you c
     * integrate them as dependencies / subrepos into this repo
 
 
+
 ## Sources
 * [Ansible docs][ansible-intro]
 * a role which I could not fit exactly to my purpose but which really helped with getting me started: [hannseman.raspbian](https://github.com/hannseman/ansible-raspbian)
@@ -366,6 +512,8 @@ Instead of writing the same tasks again and again for different playbooks, you c
 * Jeff Geerlings [Testing your Ansible roles with Molecule](https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule) (post is from 2028, installation instructions are not up to date, but it helps with getting the concept)
 * [Molecule docs](https://molecule.readthedocs.io/en/latest/)
 * my git server [work log][worklog]
+
+
 
 ---
 <b id="f1">1</b>: Keep in mind, I neither consider myself an Linux-, Raspberry-, security-, Git- or Ansible-expert. So please let me know about possible improvements and, especially, think twice before you copy-paste security related stuff! [↩](#a1)  
@@ -376,11 +524,14 @@ Instead of writing the same tasks again and again for different playbooks, you c
 <b id="f6">6</b>: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again. [↩](#a6)  
 <b id="f7">7</b>: The idea is that, after initial cloning, your Git server should not be able to access your backup source. To create backups a backup machine should pull from your Git server, e.g. via cron job. [↩](#a7)  
 
+
+
 [ansible-intro]: https://docs.ansible.com/ansible/latest/index.html
 [ansible-install]: https://docs.ansible.com/ansible/latest/installation_guide/index.html
 [ansible-inventory]: https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#intro-inventory
 [ansible-playbooks]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#about-playbooks
 [ansible-roles]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles
+[ansible-dependencies]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-dependencies
 [ansible-galaxy]: https://galaxy.ansible.com
 [ansible-variables]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html
 [ansible-precedence]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
