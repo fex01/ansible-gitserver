@@ -13,7 +13,7 @@ ansible_port: 22
 # main part of the config is in group_vars/raspbian
 
 # system user name
-user_name: "fex"
+user_name: "link"
 # password for system user
 # create: 
 #   * create hash: ansible all -i localhost, -m debug -a "msg={{ 'my_secret_password' | password_hash('sha512') }}"
