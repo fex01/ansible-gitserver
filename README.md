@@ -353,7 +353,7 @@ my-role/        # folder name is the same as the roles name
   tasks/        # one to multiple task files       
   handlers/     # actions that react on notifications
   files/        # resources
-  templates/  
+  templates/    # Jinja2 templates
   vars/         # variables with high precedence, should normally not be overwritten
   defaults/     # default values, overwritten by values linked to your inventory
   meta/         # meta information for Ansible Galaxy
@@ -368,17 +368,45 @@ You might remember from [Playbooks](#playbooks), that our play include two roles
 
 
 
-### Role prepare-raspberry 
-After explaining roles in theory - we will start with a role that has not so much to do with standard roles. A look into the role folder already shows that something is strange `working_directory/roles/prepare-raspberry`:
+### Role prepare-raspberry
+After explaining roles in theory - we will start with a role that has not so much to do with standard roles.
+> [prepare-raspberry/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/prepare-raspberry/README.md)
+>
+> Bootstrap and customize a Raspbian Lite system. To achieve that this role is using a bunch of subroles.
+> 
+> It will:
+>   * rename the default user *pi* to *user_name*
+>   * set a new user password *user_password*
+>   * rename the home dir */home/{{ user_name_old }}* to */home/{{ user_name_new }}*
+>   * create a symlink */home/{{ user_name_old }}* linking to */home/{{ user_name_new }}*
+>   * change the hostname to *host_name*
+>   * configure locale
+>   * set timezone to *localization_timezone*
+>   * activate auto-updates / -upgrades
+>   * install and configure vim
+>   * set sensible defaults for the SSH server
+>   * write public SSH keys to *user_name*'s *authorized_keys* file
+>   * install and configure a firewall (ufw)
+>
+> [...]
+
+Seems like this role is doing quite a lot of different stuff? Well, not quite - actually *prepare-raspberry* is nothing more than a wrapper for a number of different subroles, called dependencies ([Ansible - Role Dependencies][ansible-dependencies]).  
+So the role *prepare-raspberry* is not exactly necessary, it's just a convenient way to wrap a number of common roles for a Raspberry installation into one role.  
+A look into the role folder shows what that means:
 ```
+# working_directory/roles/
+
 prepare-raspberry/
   defaults/
   meta/
   README.md
 ```
-The explanation is simple - *prepare-raspberry* is nothing more than a wrapper for a number of different subroles, called dependencies ([Ansible - Role Dependencies][ansible-dependencies]). Thats why *prepare-raspberry* does not even have a *tasks* folder, all 'functionality' is contained in the dependencies section of `prepare-raspberry/meta/main.yml`
+*prepare-raspberry* does not even have a *tasks* folder, all 'functionality' is contained in the dependencies section of the meta file:
 ```yml
+# prepare-raspberry/meta/main.yml
+
 [...]
+
 dependencies:
   # List your role dependencies here, one per line. Be sure to remove the '[]' above,
   # if you add dependencies to this list.
@@ -410,66 +438,194 @@ dependencies:
     - role: ssh-server-config
     - role: weareinteractive.ufw
 ```
-So the role *prepare-raspberry* is not exactly necessary, it's just a convenient way to wrap a number of common roles that I would apply to all Raspberry installation in one role. To see what's actually done we have to dive deeper into the dependencies.
+To see what's actually done we have to dive deeper into the dependencies.
 
 
 
 #### Role set-connection-parameters
-
+> [set-connection-parameters/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/set-connection-parameters/README.md)
+>
+> This role this role will set the correct SSH port and username (default vs. custom). 
+> This might be necessary to rerun a playbook that changed either of these. 
+> *HINT*: In that case you should run *gather_facts* after this role or not at all to avoid a failed play.
+> 
+> It will:
+>   * check if the connection is possible with the default SSH port 22 and, if yes, set *{{ ansible_port }}*
+>   * check if the connection is possible with the custom SSH port *{{ ssh_port}}* and, if yes, set *{{ ansible_port }}*
+>   * check if the connection is possible with the default Raspbian user *pi* and, if yes, set *{{ ansible_user }}*
+>   * check if the connection is possible with the custom user *{{ system_user_name}}* and, if yes, set *{{ ansible_user }}*
+>   * fail if it can't determine the correct SSH port or username
+>
+> [...]
 
 
 
 #### Role provision-root
-
+> [provision-root/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/provision-root/README.md)
+> 
+> Provision *root* for passwordless SSH auth.
+> 
+> It will:
+>   * fail if *root_key* is undefined
+>   * write the provided SSH public key *root_key* into *root*s `authorized_keys` file
+>
+> [...]
 
 
 
 #### Role rename-user
+> [rename-user/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/rename-user/README.md)
+> 
+> Change a username / change a users password. Can handle the default user *pi* including all relevant files.
+> 
+> It will:
+>   * connect as *user_executing_account*
+>   * rename *user_name_old* to *user_name_new*
+>   * set a new password *user_password* (if defined)
+>   * rename the home dir */home/{{ user_name_old }}* to */home/{{ user_name_new }}*
+>   * create a symlink */home/{{ user_name_old }}* linking to */home/{{ user_name_new }}*
+>   * set the value of *ansible_user* to *user_name_new* as to not disrupt your plays connection to the host
+>   * fail gracefully (-> skip & continue play) when *user_ignore_connection_errors* is set to *true*
+>
+> [...]
 
 
 
 
 #### Role rename-host
+> [rename-host/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/rename-host/README.md)
+> 
+> This role will change the hostname of a Raspbian installation.
+> 
+> It will:
+>   * change the hostname to *host_name*
+>   * update `/etc/hosts`
+>   * reboot the host if *host_reboot* is set to *true*
+>
+> [...]
 
 
 
 
 #### Role arillso.localization
+> [arillso.localization/README.md](https://galaxy.ansible.com/arillso/localization)
+> 
+> This role configures different aspects of localization under Linux and Windows. It sets the timezone, the default locale and the keyboard layout during input.
+>
+> [...]
 
 
 
 
 #### Role weareinteractive.apt
+> [weareinteractive.apt/README.md](https://galaxy.ansible.com/weareinteractive/apt)
+> 
+> `weareinteractive.apt` is an [Ansible](http://www.ansible.com) role which:
+>
+> * updates apt
+> * cleans up apt
+> * configures apt
+> * installs packages
+> * add repositories
+> * add keys
+> * apt pinning
+> * manages unattended upgrades
+> * optionally alters solution cost
+> * optionally allows filesystems to be remounted
+>
+> [...]
 
 
 
 
 #### Role GROG.reboot
+> [grog.reboot/README.md](https://galaxy.ansible.com/grog/reboot)
+> 
+> A role for rebooting hosts.
+>
+> [...]
 
 
 
 
 #### Role manala.vim
+> [manala.vim/README.md](https://galaxy.ansible.com/manala/vim)
+> 
+> This role will deal with the setup and configuration of Vim.
+> 
+> It's part of the [Manala Ansible stack](http://www.manala.io) but can be used as a stand alone component.
+>
+> [...]
 
 
 
 
 #### Role weareinteractive.users
+> [weareinteractive.users/README.md](https://galaxy.ansible.com/weareinteractive/users)
+> 
+> `weareinteractive.users` is an [Ansible](http://www.ansible.com) role which:
+>
+> * manges users
+> * manages user's private key
+> * manages user's authorized keys
+>
+> [...]
 
 
 
 
 #### Role ssh-server-config
+> [ssh-server-config/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/ssh-server-config/README.md)
+> 
+> This role will change the SSH port, set sensible defaults in the SSH server config file and has the option to set additional settings.
+> 
+> It will:
+>   * fail when *ssh_user* is undefined to avoid a situation where no user is allowed to connect via SSH
+>   * change the default SSH port - and set *ansible_port* to the new value to avoid connectivity loss to the host
+>   * disable SSH *root* login
+>   * enable SSH strict mode
+>   * disable X11 forwarding
+>   * disable SSH password login - **you** should provision the user with keys prior to running this role! (One possible option for that would be the public role [weareinteractive.users](https://galaxy.ansible.com/weareinteractive/users))
+>   * allow SSH access only to *ssh_users*
+>   * add an SSH banner
+>   * set additional settings
+>
+> [...]
 
 
 
 
 #### Role weareinteractive.ufw
-
+> [weareinteractive.ufw/README.md](https://galaxy.ansible.com/weareinteractive/ufw)
+> 
+> `weareinteractive.ufw` is an [Ansible](http://www.ansible.com) role which:
+>
+> * installs ufw
+> * configures ufw
+> * configures ufw rules
+> * configures service
+>
+> [...]
 
 
 
 ### Role gitserver-config
+> [gitserver-config/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/gitserver-config/README.md)
+> 
+> Create a dedicated user for git operations, install git & clone your repos.
+> 
+> It will
+> * create an non-sudo user {{ git_os_user_name }}
+>   * shell restricted to git-shell and without interactive login
+>   * provisioned with authorized keys
+>   * provisioned with a private key for initial cloning
+>   * with restricted SSH access (no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty)
+> * add a second user {{ user_name }} without special restrictions to group {{ git_os_user_name }}
+> * install and configure git
+> * clone specified repos (make sure that the source accepts the private key)
+> * deletes the private key after cloning (the idea is that, after initial cloning, your git server should not be able to access your backup source)
+>
+> [...]
 
 
 
@@ -480,6 +636,15 @@ So the role *prepare-raspberry* is not exactly necessary, it's just a convenient
 
 
 #### Role weareinteractive.git
+> [weareinteractive.git/README.md](https://galaxy.ansible.com/weareinteractive/git)
+> 
+> `weareinteractive.git` is an [Ansible](http://www.ansible.com) role which:
+>
+> * installs git
+> * configures git
+> * manages repositories
+>
+> [...]
 
 
 
