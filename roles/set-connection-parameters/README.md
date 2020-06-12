@@ -1,8 +1,8 @@
 set-connection-parameters
 =========
 
-This role this role will set the correct SSH port and username (default vs. custom). 
-This might be necessary to rerun a playbook that changed either of these. 
+This role will set the correct SSH port and username (default vs. custom).  
+This might be necassary to rerun a playbook that changed either of these.  
 *HINT*: In that case you should run *gather_facts* after this role or not at all to avoid a failed play.
 
 ### It will:

@@ -445,8 +445,8 @@ To see what's actually done we have to dive deeper into the dependencies.
 #### Role set-connection-parameters
 > [set-connection-parameters/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/set-connection-parameters/README.md)
 >
-> This role this role will set the correct SSH port and username (default vs. custom). 
-> This might be necessary to rerun a playbook that changed either of these. 
+> This role will set the correct SSH port and username (default vs. custom).  
+> This might be necassary to rerun a playbook that changed either of these.  
 > *HINT*: In that case you should run *gather_facts* after this role or not at all to avoid a failed play.
 > 
 > It will:
@@ -684,7 +684,7 @@ To see what's actually done we have to dive deeper into the dependencies.
 <b id="f1">1</b>: Keep in mind, I neither consider myself an Linux-, Raspberry-, security-, Git- or Ansible-expert. So please let me know about possible improvements and, especially, think twice before you copy-paste security related stuff! [↩](#a1)  
 <b id="f2">2</b>: You can install Ansible on a variety of different Linux distributions or macOS, have a look at the [docs](https://docs.ansible.com/ansible/latest/installation_guide/index.html) [↩](#a2)  
 <b id="f3">3</b>: An older model shouldn't be a problem, I just had that one laying around. [↩](#a3)  
-<b id="f4">4</b>: Thats still on the TODO list for my Ansible play - see also [TODO](#todo) [↩](#a4)
+<b id="f4">4</b>: Thats still on the TODO list for my Ansible play - see also [TODO](#todo) [↩](#a4)  
 <b id="f5">5</b>: Your mounting point for the SD Card might differ [↩](#a5)  
 <b id="f6">6</b>: If you use etcher either disable auto-eject before writing the image or eject and reinsert your SD Card to mount it again. [↩](#a6)  
 <b id="f7">7</b>: The idea is that, after initial cloning, your Git server should not be able to access your backup source. To create backups a backup machine should pull from your Git server, e.g. via cron job. [↩](#a7)  
