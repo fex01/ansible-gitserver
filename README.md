@@ -458,6 +458,61 @@ To see what's actually done we have to dive deeper into the dependencies.
 >
 > [...]
 
+Seems like we are getting nearer to where the work is actually done - so lets see at how that looks:
+```yml
+# set-connection-parameters/tasks/main.yml
+
+# From localhost, check if we're able to reach {{ inventory_hostname }} on
+# port 22
+- name: Check if we're using the default SSH port
+  become: false
+  wait_for:
+    port: "22"
+    state: "started"
+    host: "{{ ansible_host | default(inventory_hostname) }}"
+    connect_timeout: "5"
+    timeout: "10"
+  delegate_to: "localhost"
+  ignore_errors: "yes"
+  register: default_ssh
+
+# If reachable, continue the following tasks with this port
+- name: Set inventory ansible_port to default
+  set_fact:
+    ansible_port: "22"
+  when: default_ssh is defined and
+        default_ssh.state is defined and
+        default_ssh.state == "started"
+  register: connection_default_port_set
+
+[...]
+```
+These two tasks actually do what the first *It will* bulletpoint of the readme mentions
+>   * check if the connection is possible with the default SSH port 22 and, if yes, set *{{ ansible_port }}*
+
+Lets go trough that line by line:
+* `- name: Check if we're using the default SSH port` - name of a specific task, you will see these names when an Ansible playbook is executing
+  * `become: false` - The *become* keyword stands for privilege escalation, e.g. getting root privileges (details see [Ansible - Understanding privilege escalation: become][ansible-become]).  
+  In this case this specific task should **not** run with root privileges. We do this because this task is executed on our ansible machine, not on the targeted host!
+  * `wait_for:` - A single task executes a single module, Ansibles discret unit of code (details see [Ansible - Introduction to modules][ansible-modules]). The [wait_for][modules-wait_for] module can be used to ping a target and to report the result.  
+  Lets have a look at *wait_for*s parameters:
+    * `port: "22"` - ping the target on port 22
+    * `state: "started"` - report if the targeted port responds
+    * `host: "{{ ansible_host | default(inventory_hostname) }}"` - target to ping, the expression in curly brackets means 'Use *ansible_host* if variable is set, otherwise use the hostname in our inventory'
+    * `connect_timeout: "5"` - number of seconds to wait for the connection to be established
+    * `timeout: "10"` - number of seconds to wait before reporting an error
+  * `delegate_to: "localhost"` - Execute this task not on the targeted host but locally on our ansible machine. Since this task should test if we can connect from our ansible machine to the targeted host that might make sense...
+  * `ignore_errors: "yes"` - Normally Ansible would stop the whole play when running into an error. Since we want to test something and continue the play afterwards, we have to ignore errors.
+  * `register: default_ssh` - creates a new variable *default_ssh* and saves the result of the executed module
+* `- name: Set inventory ansible_port to default` - next task
+  * `set_fact:` - The [set_fact][modules-set_fact] module can be used to assign a new value to a existing variable.
+    * `ansible_port: 22` - The variable *ansible_port* informs Ansible on which port it can establish an SSH connection to the targeted host.
+  * `when:` - only execute this task when the following conditions are fullfilled:
+    * `default_ssh is defined and` - variable *default_ssh* is known and
+    * `default_ssh.state is defined and` - has a field named 'state' and
+    * `default_ssh.state == "started` - the value of said field is 'started'
+  * `register: connection_default_port_set` - Create a new variable called *connection_default_port_set* and save if the task was executed.
+
 
 
 #### Role provision-root
@@ -700,5 +755,9 @@ To see what's actually done we have to dive deeper into the dependencies.
 [ansible-galaxy]: https://galaxy.ansible.com
 [ansible-variables]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html
 [ansible-precedence]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
+[ansible-become]: https://docs.ansible.com/ansible/latest/user_guide/become.html
+[ansible-modules]: https://docs.ansible.com/ansible/latest/user_guide/modules_intro.html
+[module-wait_for]: https://docs.ansible.com/ansible/latest/modules/wait_for_module.html
+[module-set_fact]: https://docs.ansible.com/ansible/latest/modules/set_fact_module.html
 [git-server]: https://git-scm.com/book/en/v2/Git-on-the-Server-Getting-Git-on-a-Server
 [worklog]: https://community.openhab.org/t/setting-up-my-own-git-server-on-a-pi/
