@@ -74,18 +74,18 @@ I decided to take an existing [work log][worklog], to turn it into an Ansible pl
 
 ### What am I trying to achieve?
 The aim is to take a fresh Raspbian installation, do some hardening, install git and have a ready to use private Git server. The details on how I did that manually you can find in said [work log][worklog], the steps break down to:
-* change username pi to a custom username
-* change the default password
+* change username pi to a custom username ([Role rename-user](#role-rename-user))
+* change the default password ([Role rename-user](#role-rename-user))
 * require password for sudo<sup id="a4">[4](#f4)</sup>
-* change default hostname
-* SSH hardening
-* auto updates
-* install and configure firewall ([ufw](https://en.wikipedia.org/wiki/Uncomplicated_Firewall))
-* install & configure vim (optional, it's just my preferred editor)
-* install & configure git
-* create additional user git
-* restrict user git to git shell
-* clone repos from backup
+* change default hostname ([Role rename-host](#role-rename-host))
+* SSH hardening ([Role ssh-server-config](#role-ssh-server-config))
+* auto updates ([Role weareinteractive.apt](#role-weareinteractiveapt))
+* install and configure firewall ([ufw](https://en.wikipedia.org/wiki/Uncomplicated_Firewall)) ([Role weareinteractive.ufw](#role-weareinteractiveufw))
+* install & configure vim (optional, it's just my preferred editor) ([Role manala.vim](#role-manalavim))
+* install & configure git ([Role weareinteractive.git](#role-weareinteractivegit))
+* create additional user git ([Role weareinteractive.users - again?](#role-weareinteractiveusers---again))
+* restrict user git to git shell ([Role gitserver-config](#role-gitserver-config))
+* clone repos from backup ([Role weareinteractive.git](#role-weareinteractivegit))
 
 
 
