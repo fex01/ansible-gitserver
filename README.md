@@ -1,5 +1,4 @@
 Work in Progress, still TODO:
-* [ ] writing #Deep Dive
 * [ ] writing #Testing
 
 # Ansible Git Server
@@ -546,9 +545,8 @@ dependencies:
 
 
 ## Testing
-
-
-
+As you see in [Going back to Start](#going-back-to-start), its quite easy to reset your Raspby and to start the play from scratch. Still - if you use this project as starting point and change the play (or write your own play), it gets bothersome to rewrite your SD Card again and again and ...  
+Wouldn't it be much nicer to spin up a Docker Container in a defined state, test your play and reset the container as often as needed without manual steps? Say  hello to [Molecule][molecule-docs].
 
 
 
@@ -570,8 +568,8 @@ dependencies:
 * a role which I could not fit exactly to my purpose but which really helped with getting me started: [hannseman.raspbian](https://github.com/hannseman/ansible-raspbian)
 * the code from [moodlebox](https://github.com/moodlebox/moodlebox) was quite helpful vor renaming the default user via Ansible
 * Ansibles roles repo [Ansible Galaxy](https://galaxy.ansible.com) in general - just have a look into the source code of different roles to learn
-* Jeff Geerlings [Testing your Ansible roles with Molecule](https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule) (post is from 2028, installation instructions are not up to date, but it helps with getting the concept)
-* [Molecule docs](https://molecule.readthedocs.io/en/latest/)
+* Jeff Geerlings [Testing your Ansible roles with Molecule](https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule) (post is from 2018, installation instructions are not up to date, but it helps with getting the concept)
+* [latest Molecule docs][molecule-docs]
 * my git server [work log][worklog]
 
 
@@ -602,3 +600,4 @@ dependencies:
 [module-set_fact]: https://docs.ansible.com/ansible/latest/modules/set_fact_module.html
 [git-server]: https://git-scm.com/book/en/v2/Git-on-the-Server-Getting-Git-on-a-Server
 [worklog]: https://community.openhab.org/t/setting-up-my-own-git-server-on-a-pi/
+[molecule-docs]: https://molecule.readthedocs.io/en/latest/
