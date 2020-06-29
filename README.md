@@ -327,7 +327,7 @@ This chapter will look into whats actually happening when you execute your playb
 Lets start with the command we are executing: `ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt`
 * `ansible-playbook gitserver.yml` execute playbook 'gitserver.yml'
 * `-i ./hosts` use the file 'hosts' in the current directory as inventory
-* `--vault-id git@prompt` this play has encrypted variables, ask me for the decryption password, password hint is 'git'
+* `--vault-id git@prompt` this play has encrypted variables, ask for the decryption password, password hint is 'git'
 
 
 
