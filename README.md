@@ -1,6 +1,3 @@
-Work in Progress, still TODO:
-* [ ] writing #Testing
-
 # Ansible Git Server
 An example using Ansible to set up a private Git server on a Raspberry Pi.
 
@@ -33,6 +30,9 @@ An example using Ansible to set up a private Git server on a Raspberry Pi.
    * [Tasks](#tasks)
    * [Dependencies](#dependencies)
 * [Testing](#testing)
+  * [Installing Molecule](#installing-molecule)
+  * [Prepare Role for Molecule](#prepare-role-for-molecule)
+  * [Using Molecule](#using-molecule)
 * [TODO](#todo)
 * [Sources](#sources)
 
@@ -60,18 +60,18 @@ I decided to take an existing [work log][worklog], to turn it into an Ansible pl
 
 ### What am I trying to achieve?
 The aim is to take a fresh Raspbian installation, do some hardening, install git and have a ready to use private Git server. The details on how I did that manually you can find in said [work log][worklog], the steps break down to:
-* change username pi to a custom username ([Role rename-user](#role-rename-user))
-* change the default password ([Role rename-user](#role-rename-user))
+* change username pi to a custom username ([Role rename-user](https://github.com/fex01/ansible-gitserver/blob/master/roles/rename-user/README.md))
+* change the default password ([Role rename-user](https://github.com/fex01/ansible-gitserver/blob/master/roles/rename-user/README.md))
 * require password for sudo<sup id="a4">[4](#f4)</sup>
-* change default hostname ([Role rename-host](#role-rename-host))
-* SSH hardening ([Role ssh-server-config](#role-ssh-server-config))
-* auto updates ([Role weareinteractive.apt](#role-weareinteractiveapt))
-* install and configure firewall ([ufw](https://en.wikipedia.org/wiki/Uncomplicated_Firewall)) ([Role weareinteractive.ufw](#role-weareinteractiveufw))
-* install & configure vim (optional, it's just my preferred editor) ([Role manala.vim](#role-manalavim))
-* install & configure git ([Role weareinteractive.git](#role-weareinteractivegit))
-* create additional user git ([Role weareinteractive.users - again?](#role-weareinteractiveusers---again))
-* restrict user git to git shell ([Role gitserver-config](#role-gitserver-config))
-* clone repos from backup ([Role weareinteractive.git](#role-weareinteractivegit))
+* change default hostname ([Role rename-host](https://github.com/fex01/ansible-gitserver/blob/master/roles/rename-host/README.md))
+* SSH hardening ([Role ssh-server-config](https://github.com/fex01/ansible-gitserver/blob/master/roles/set-connection-parameters/README.md))
+* auto updates ([Role weareinteractive.apt](https://github.com/weareinteractive/ansible-apt/blob/master/README.md))
+* install and configure firewall ([ufw](https://en.wikipedia.org/wiki/Uncomplicated_Firewall)) ([Role weareinteractive.ufw](https://github.com/weareinteractive/ansible-ufw/blob/master/README.md))
+* install & configure vim (optional, it's just my preferred editor) ([Role manala.vim](https://github.com/manala/ansible-roles/blob/master/roles/vim/README.md))
+* install & configure git ([Role weareinteractive.git](https://github.com/weareinteractive/ansible-git/blob/master/README.md))
+* create additional user git ([Role weareinteractive.users](https://github.com/weareinteractive/ansible-users/blob/master/README.md))
+* restrict user git to git shell ([Role gitserver-config](https://github.com/fex01/ansible-gitserver/blob/master/roles/gitserver-config/README.md))
+* clone repos from backup ([Role weareinteractive.git](https://github.com/weareinteractive/ansible-git/blob/master/README.md))
 
 
 
@@ -327,7 +327,7 @@ This chapter will look into whats actually happening when you execute your playb
 Lets start with the command we are executing: `ansible-playbook gitserver.yml -i ./hosts --vault-id git@prompt`
 * `ansible-playbook gitserver.yml` execute playbook 'gitserver.yml'
 * `-i ./hosts` use the file 'hosts' in the current directory as inventory
-* `--vault-id git@prompt` this play has encrypted variables, ask for the decryption password, password hint is 'git'
+* `--vault-id git@prompt` this play has encrypted variables, asks for the decryption password, password hint is 'git'
 
 
 
@@ -345,7 +345,7 @@ my-role/        # folder name is the same as the roles name
   meta/         # meta information for Ansible Galaxy
   README.md     # readme explaining function and usage of the specific role
 ```
-If you have a look into the roles in *working_directory/roles/*, you will see that not all roles have all folders. That's no trouble, if a specific role doesn't need, for example, additional resources than the role doesn't need a *files* folder. A prime example of that is my *prepare-raspberry* role - in that folder you will only find the *meta* folder and the *README.md* file.  
+If you have a look into the roles in *working_directory/roles/*, you will see that not all roles have all folders. That's no trouble, if a specific role doesn't need, for example, additional resources than the role doesn't need a *files* folder. A prime example of that is my *prepare-raspberry* role - in that folder you will only find the *defaults* folder, the *meta* folder and the *README.md* file.  
 On the other hand your role might have additional folder, for example for testing. An example of that would be my *gitserver-config* role with the added folder *molecule* (more about testing and Molecule in [Testing](#testing)).  
 If you take an existing role, e.g. from [Ansible Galaxy][ansible-galaxy], the way to customize role execution is by overwriting default variables in *role_name/default/main.yml*, for example by having the same variable name with a customized value in your group_vars. An example in this project would be *user_name*. You will find that variable in *working_directory/roles/prepare-raspberry/defaults/main.yml*, but since the variable is also set in *working_directory/group_vars/gitserver.yml* the default value will be overwritten by whatever you set in *working_directory/group_vars/gitserver.yml* (details about precedence see [Ansible - Variable precedence: Where should I put a variable?][ansible-precedence]).  
 To avoid ambiguity - you don't change anything inside the roles folder. You overwrite role defaults by having the same variable_name linked to your inventory.
@@ -398,14 +398,14 @@ So how does that translate into tasks? Let's have a look at *set-connection-para
 
 [...]
 ```
-These two tasks actually do what the first *It will* bulletpoint of the readme mentions
+These two tasks actually do what the first *It will* bullet point of the readme mentions
 >   * check if the connection is possible with the default SSH port 22 and, if yes, set *{{ ansible_port }}*
 
 Lets go trough that line by line:
 * `- name: Check if we're using the default SSH port` - name of a specific task, you will see these names when an Ansible playbook is executing
   * `become: false` - The *become* keyword stands for privilege escalation, e.g. getting root privileges (details see [Ansible - Understanding privilege escalation: become][ansible-become]).  
   In this case this specific task should **not** run with root privileges. We do this because this task is executed on our ansible machine, not on the targeted host!
-  * `wait_for:` - A single task executes a single module, Ansibles discret unit of code (details see [Ansible - Introduction to modules][ansible-modules]). The [wait_for][modules-wait_for] module can be used to ping a target and to report the result.  
+  * `wait_for:` - A single task executes a single module, Ansibles discrete unit of code (details see [Ansible - Introduction to modules][ansible-modules]). The [wait_for][modules-wait_for] module can be used to ping a target and to report the result.  
   Lets have a look at *wait_for*s parameters:
     * `port: "22"` - ping the target on port 22
     * `state: "started"` - report if the targeted port responds
@@ -418,7 +418,7 @@ Lets go trough that line by line:
 * `- name: Set inventory ansible_port to default` - next task
   * `set_fact:` - The [set_fact][modules-set_fact] module can be used to assign a new value to a existing variable.
     * `ansible_port: 22` - The variable *ansible_port* informs Ansible on which port it can establish an SSH connection to the targeted host.
-  * `when:` - only execute this task when the following conditions are fullfilled:
+  * `when:` - only execute this task when the following conditions are fulfilled:
     * `default_ssh is defined and` - variable *default_ssh* is known and
     * `default_ssh.state is defined and` - has a field named 'state' and
     * `default_ssh.state == "started` - the value of said field is 'started'
@@ -458,15 +458,15 @@ With this background it should now be easy to read the next two tasks:
 
 [...]
 ```
-Right, we're fullfilling the second *It will* bulletpoint of the readme
+Right, we're fulfilling the second *It will* bullet point of the readme
 >   * check if the connection is possible with the custom SSH port *{{ ssh_port}}* and, if yes, set *{{ ansible_port }}*
 
-by testing the connection on our custom port. The only change is, that we only test the custom port if the test for the default port was unsuccessfull:
+by testing the connection on our custom port. The only change is, that we only test the custom port if the test for the default port was unsuccessful:
 ```yml
   when: default_ssh is defined and
         default_ssh.state is undefined
 ```
-As you can see Ansible tasks are actually quite readable, even without indepth coding/scripting knowledge. If you have any question how my roles or in general all roles on [Ansible Galaxy][ansible-galaxy] work - just have a look into the roles tasks folder.
+As you can see Ansible tasks are actually quite readable, even without detailed coding/scripting knowledge. If you have any question how my roles or in general all roles on [Ansible Galaxy][ansible-galaxy] work - just have a look into the roles tasks folder.
 
 
 
@@ -545,8 +545,52 @@ dependencies:
 
 
 ## Testing
-As you see in [Going back to Start](#going-back-to-start), its quite easy to reset your Raspby and to start the play from scratch. Still - if you use this project as starting point and change the play (or write your own play), it gets bothersome to rewrite your SD Card again and again and ...  
-Wouldn't it be much nicer to spin up a Docker Container in a defined state, test your play and reset the container as often as needed without manual steps? Say  hello to [Molecule][molecule-docs].
+As you see in [Going back to Start](#going-back-to-start), its quite easy to reset your Raspy and to start the play from scratch. Still - if you use this project as starting point and change the play (or write your own play), it gets bothersome to rewrite your SD Card again and again and ...  
+Wouldn't it be much nicer to spin up a Docker Container in a defined state, test your play and reset the container as often as needed without manual steps? Say hello to [Molecule][molecule-docs].
+
+It seems like Molecule will not be able to help you in all situations, for example
+* I did not find a easy to use Raspbian Docker Image (see also [TODO](#todo)), so I test against [pycontribs Debian image][molecule-debian].
+* Molecule does not use SSH to connect to the tested container, so just because you had no connection problems during Molecule tests doesn't mean that Ansible could connect without trouble in real life. Means Molecule might be suboptimal to test bootstrapping related roles.
+
+Having said that, Molecule is almost magic when you can use it. My introduction here is a bare minimum to get started, a next step might be Jeff Geerlings post linked in [Sources](#sources) (his post also talks about how to integrating Molecule into automated testing).
+
+
+
+### Installing Molecule
+The following steps are for Ubuntu, for details / up-to-date instructions / other OSs have a look into [Molecule - Installation][molecule-install]:
+* `sudo apt-get update`
+* `sudo apt-get install -y python3-pip libssl-dev`
+* `python3 -m pip install --upgrade --user setuptools`
+* `python3 -m pip install --user "molecule[lint]"`
+* `python3 -m pip install --user "molecule[docker]“`
+* test successful installation with
+  * `molecule --version`
+* command not found?
+  * `export PATH=$PATH:~/.local/bin`
+  * add 'PATH=$PATH:~/.local/bin' also to *~/.bashrc*
+
+
+
+### Prepare Role for Molecule
+* `cd ~/ansible/roles` go to *working_directory/roles*
+* add molecule to existing role
+  * `molecule init scenario -r my-role-name` 
+* init role
+  * `molecule init role my-role-name`
+
+
+
+### Using Molecule
+One role already using Molecule for testing is my role *gitserver-config*. Your first experience with molecule could be as easy as going to *working_directory/roles/gitserver-config* and running `molecule test`. This will run the full gauntlet from destroying old test instances, creating a new one, taking care of necessary preparations, testing, etc.  
+In general I prefer to use single step commands to create an instance and to test my code again and again as I progress. A few single step commands would be:
+* `molecule create` create docker instance
+* `molecule list` list running instances
+* `molecule converge` test code
+* `molecule --debug converge` debug
+* `molecule login` manual inspection
+* `molecule destroy` destroy instance
+
+A look into the files in *working_directory/roles/gitserver-config/molecule/default/* might, for example, also show you how to prepare your test using additional roles or how to overwrite Inventory variables for testing.
 
 
 
@@ -601,3 +645,5 @@ Wouldn't it be much nicer to spin up a Docker Container in a defined state, test
 [git-server]: https://git-scm.com/book/en/v2/Git-on-the-Server-Getting-Git-on-a-Server
 [worklog]: https://community.openhab.org/t/setting-up-my-own-git-server-on-a-pi/
 [molecule-docs]: https://molecule.readthedocs.io/en/latest/
+[molecule-debian]: https://hub.docker.com/r/pycontribs/debian
+[molecule-install]: https://molecule.readthedocs.io/en/latest/installation.html
