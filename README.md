@@ -168,7 +168,7 @@ Now what do we have to do on our ansible machine to use our Git server as remote
     * done, `git remote show` will now show two remotes for this repo, origin & private
     * with `git remote show origin` or `git remote show private` you can test the connection to the remote and see details like the remotes URL
 
-While this test run was nice to see that Ansible actually does the job, **I would strongly counsel against using your new server at it is - you are still using user names & passwords chosen by me**!
+While this test run was nice to see that Ansible actually does the job, **I would strongly counsel against using your new server as it is - you are still using user names & passwords chosen by me**!
 Let's have a look at the next chapter to change that.
 
 
