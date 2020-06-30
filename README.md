@@ -125,6 +125,10 @@ Recommendation: Assign a permanent IP address to your Raspi, probably done via y
 
 
 ## Getting Started
+This chapter is aimed at getting you started with minimal effort. If you don't mind some reading before you go hands-on, than skip [Getting Started](#getting-started), read [Deep Dive](#deep-dive) and then go hands-on with [Getting Useful](#getting-useful).
+
+
+
 ### Minimal Configuration
 For a first test run it's enough to open your ansible-gitserver working directory and change the following values:
 * `working_directory/group_vars/all.yml/ssh_public_keys` - public SSH key of your ansible machine
