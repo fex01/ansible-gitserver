@@ -109,7 +109,7 @@ The following steps are for Ubuntu, for details / other OSs have a look into the
 ### Prepare Work Environment 
 * create an empty folder, e.g. ansible-gitserver, and cd into said folder
 * `git clone https://github.com/fex01/ansible-gitserver.git ./`
-* download required public roles `ansible-galaxy install -r requirements.yml --role-path ./roles/` into 'working directory/roles'
+* download required public roles `ansible-galaxy install -r roles/requirements.yml --role-path ./roles/` into 'working directory/roles'
 
 
 
