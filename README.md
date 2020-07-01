@@ -362,7 +362,7 @@ To understand how tasks actually work, we have a look at my role *set-connection
 > [set-connection-parameters/README.md](https://github.com/fex01/ansible-gitserver/blob/master/roles/set-connection-parameters/README.md)
 >
 > This role will set the correct SSH port and username (default vs. custom).  
-> This might be necassary to rerun a playbook that changed either of these.  
+> This might be necessary to rerun a playbook that changed either of these.  
 > *HINT*: In that case you should run *gather_facts* after this role or not at all to avoid a failed play.
 > 
 > It will:
