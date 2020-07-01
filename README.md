@@ -55,6 +55,7 @@ I decided to take an existing [work log][worklog], to turn it into an Ansible pl
 * target: [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<sup id="a3">[3](#f3)</sup>
 * target OS: [Raspbian Buster Lite](https://www.raspberrypi.org/downloads/raspbian/)
 * server administration tool: [Ansible 2.9][ansible-intro]
+* [Git](https://git-scm.com/)
 
 
 
