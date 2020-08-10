@@ -645,8 +645,8 @@ A look into the files in *working_directory/roles/gitserver-config/molecule/defa
 [ansible-precedence]: https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
 [ansible-become]: https://docs.ansible.com/ansible/latest/user_guide/become.html
 [ansible-modules]: https://docs.ansible.com/ansible/latest/user_guide/modules_intro.html
-[module-wait_for]: https://docs.ansible.com/ansible/latest/modules/wait_for_module.html
-[module-set_fact]: https://docs.ansible.com/ansible/latest/modules/set_fact_module.html
+[modules-wait_for]: https://docs.ansible.com/ansible/latest/modules/wait_for_module.html
+[modules-set_fact]: https://docs.ansible.com/ansible/latest/modules/set_fact_module.html
 [git-server]: https://git-scm.com/book/en/v2/Git-on-the-Server-Getting-Git-on-a-Server
 [worklog]: https://community.openhab.org/t/setting-up-my-own-git-server-on-a-pi/
 [molecule-docs]: https://molecule.readthedocs.io/en/latest/
