@@ -615,7 +615,7 @@ A look into the files in *working_directory/roles/gitserver-config/molecule/defa
 ## Sources
 * [Ansible docs][ansible-intro]
 * a role which I could not fit exactly to my purpose but which really helped with getting me started: [hannseman.raspbian](https://github.com/hannseman/ansible-raspbian)
-* the code from [moodlebox](https://github.com/moodlebox/moodlebox) was quite helpful vor renaming the default user via Ansible
+* the code from [moodlebox](https://github.com/moodlebox/moodlebox) was quite helpful for renaming the default user via Ansible
 * Ansibles roles repo [Ansible Galaxy](https://galaxy.ansible.com) in general - just have a look into the source code of different roles to learn
 * Jeff Geerlings [Testing your Ansible roles with Molecule](https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule) (post is from 2018, installation instructions are not up to date, but it helps with getting the concept)
 * [latest Molecule docs][molecule-docs]
