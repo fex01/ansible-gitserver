@@ -46,7 +46,7 @@ ssh_port: 22
 ############################################################
 
 # to be added to group {{ git_os_user_name }}
-system_user: "{{ user_name }}"
+system_user: "{{ user_name }}"
 # git connections will not be done with the system user but with a dedicated git user
 git_os_user_name: git
 # password for the dedicated git user
